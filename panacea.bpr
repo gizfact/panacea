@@ -1,0 +1,218 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!-- C++Builder XML Project -->
+<PROJECT>
+  <MACROS>
+    <VERSION value="BCB.06.00"/>
+    <PROJECT value="panacea.exe"/>
+    <OBJFILES value="panacea.obj main.obj login.obj md5.obj accounts.obj lib.obj clients.obj 
+      i_clients.obj services.obj goods.obj goodsincome.obj settings.obj 
+      abtypes.obj kassa.obj personal.obj i_abtypes.obj visits.obj i_visits.obj 
+      repBalanse.obj dt_interval.obj repNegBalanse.obj repAbServices.obj 
+      abparam.obj repVisits.obj repVisitsSPA.obj repBalanseSPA.obj purchase.obj 
+      repSells.obj balanse.obj servicegoods.obj bath.obj repGoodsSPA.obj 
+      SevenZipVCL.obj pwd.obj barber.obj nail.obj sells.obj calendar.obj 
+      rescaltime.obj fitgroup.obj i_fitgroup.obj fitshedule.obj dm_main.obj 
+      gservlist.obj cosmetic.obj bills.obj rescontrol.obj sync.obj 
+      repAdWorkDay.obj discard.obj visitsbath.obj kkm.obj kkm_outcome.obj"/>
+    <RESFILES value="panacea.res"/>
+    <IDLFILES value=""/>
+    <IDLGENFILES value=""/>
+    <DEFFILE value=""/>
+    <RESDEPEN value="$(RESFILES) main.dfm login.dfm accounts.dfm clients.dfm i_clients.dfm 
+      services.dfm goods.dfm goodsincome.dfm settings.dfm abtypes.dfm kassa.dfm 
+      personal.dfm i_abtypes.dfm visits.dfm i_visits.dfm repBalanse.dfm 
+      dt_interval.dfm repNegBalanse.dfm repAbServices.dfm abparam.dfm 
+      repVisits.dfm repVisitsSPA.dfm repBalanseSPA.dfm purchase.dfm repSells.dfm 
+      balanse.dfm servicegoods.dfm bath.dfm repGoodsSPA.dfm pwd.dfm barber.dfm 
+      nail.dfm sells.dfm calendar.dfm rescaltime.dfm fitgroup.dfm i_fitgroup.dfm 
+      fitshedule.dfm dm_main.dfm gservlist.dfm cosmetic.dfm bills.dfm 
+      rescontrol.dfm repAdWorkDay.dfm discard.dfm visitsbath.dfm kkm_outcome.dfm"/>
+    <LIBFILES value=""/>
+    <LIBRARIES value="dsnap.lib bcb2kaxserver.lib indy.lib dbxcds.lib dclocx.lib soaprtl.lib 
+      bcbie.lib nmfast.lib dbexpress.lib inetdbxpress.lib inetdbbde.lib 
+      dsnapcon.lib dsnapcrba.lib visualdbclx.lib teeqr.lib dss.lib tee.lib 
+      teedb.lib teeui.lib bdecds.lib cds.lib ibxpress.lib vcldbx.lib adortl.lib 
+      vcldb.lib bcbsmp.lib dbrtl.lib bdertl.lib vclx.lib qrpt.lib rtl.lib vcl.lib"/>
+    <SPARELIBS value="vcl.lib rtl.lib qrpt.lib vclx.lib bdertl.lib dbrtl.lib bcbsmp.lib 
+      vcldb.lib adortl.lib vcldbx.lib ibxpress.lib cds.lib bdecds.lib teeui.lib 
+      teedb.lib tee.lib dss.lib teeqr.lib visualdbclx.lib dsnapcrba.lib 
+      dsnapcon.lib inetdbbde.lib inetdbxpress.lib dbexpress.lib nmfast.lib 
+      bcbie.lib soaprtl.lib dclocx.lib dbxcds.lib indy.lib bcb2kaxserver.lib 
+      dsnap.lib"/>
+    <PACKAGES value="vcl.bpi rtl.bpi dbrtl.bpi adortl.bpi vcldb.bpi vclx.bpi bdertl.bpi 
+      vcldbx.bpi ibxpress.bpi dsnap.bpi cds.bpi bdecds.bpi qrpt.bpi teeui.bpi 
+      teedb.bpi tee.bpi dss.bpi teeqr.bpi visualclx.bpi visualdbclx.bpi 
+      dsnapcrba.bpi dsnapcon.bpi bcbsmp.bpi vclie.bpi xmlrtl.bpi inet.bpi 
+      inetdbbde.bpi inetdbxpress.bpi inetdb.bpi nmfast.bpi webdsnap.bpi 
+      bcbie.bpi websnap.bpi soaprtl.bpi dclocx.bpi dbexpress.bpi dbxcds.bpi 
+      indy.bpi bcb2kaxserver.bpi"/>
+    <PATHCPP value=".;"/>
+    <PATHPAS value=".;"/>
+    <PATHRC value=".;"/>
+    <PATHASM value=".;"/>
+    <DEBUGLIBPATH value="$(BCB)\lib\debug"/>
+    <RELEASELIBPATH value="$(BCB)\lib\release"/>
+    <LINKER value="ilink32"/>
+    <USERDEFINES value="_DEBUG"/>
+    <SYSDEFINES value="NO_STRICT"/>
+    <MAINSOURCE value="panacea.cpp"/>
+    <INCLUDEPATH value="D:\panacea;&quot;C:\Program Files (x86)\Borland\CBuilder6\Projects&quot;;D:\Borland\CBuilder6\Projects;&quot;C:\Program Files\Borland\CBuilder6\Projects&quot;;&quot;C:\Documents and Settings\zax\Рабочий стол\panacea&quot;;$(BCB)\include;$(BCB)\include\vcl"/>
+    <LIBPATH value="D:\panacea;&quot;C:\Program Files (x86)\Borland\CBuilder6\Projects&quot;;$(BCB)\Projects\Lib;D:\Borland\CBuilder6\Projects;&quot;C:\Program Files\Borland\CBuilder6\Projects&quot;;&quot;C:\Documents and Settings\zax\Рабочий стол\panacea&quot;;$(BCB)\lib\obj;$(BCB)\lib"/>
+    <WARNINGS value="-w-par"/>
+    <OTHERFILES value=""/>
+  </MACROS>
+  <OPTIONS>
+    <IDLCFLAGS value="-ID:\panacea -I&quot;C:\Program Files (x86)\Borland\CBuilder6\Projects&quot; 
+      -ID:\Borland\CBuilder6\Projects 
+      -I&quot;C:\Program Files\Borland\CBuilder6\Projects&quot; 
+      -I&quot;C:\Documents and Settings\zax\Рабочий стол\panacea&quot; -I$(BCB)\include 
+      -I$(BCB)\include\vcl -src_suffix cpp -D_DEBUG -boa"/>
+    <CFLAG1 value="-Od -H=$(BCB)\lib\vcl60.csm -Hc -Vx -Ve -ff -X- -r- -a8 -6 -b- -d -k -y -v 
+      -vi- -c -tW -tWM"/>
+    <PFLAGS value="-$Y+ -$W -$O- -$A8 -v -JPHNE -M"/>
+    <RFLAGS value=""/>
+    <AFLAGS value="/mx /w2 /zi"/>
+    <LFLAGS value="-D&quot;&quot; -aa -Tpe -x -Gn -v"/>
+    <OTHERFILES value=""/>
+  </OPTIONS>
+  <LINKER>
+    <ALLOBJ value="c0w32.obj sysinit.obj $(OBJFILES)"/>
+    <ALLRES value="$(RESFILES)"/>
+    <ALLLIB value="$(LIBFILES) $(LIBRARIES) import32.lib cp32mt.lib"/>
+    <OTHERFILES value=""/>
+  </LINKER>
+  <FILELIST>
+      <FILE FILENAME="panacea.res" FORMNAME="" UNITNAME="panacea.res" CONTAINERID="ResTool" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="panacea.cpp" FORMNAME="" UNITNAME="panacea" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="main.cpp" FORMNAME="MainForm" UNITNAME="main" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="login.cpp" FORMNAME="LoginForm" UNITNAME="login" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="md5.cpp" FORMNAME="" UNITNAME="md5" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="accounts.cpp" FORMNAME="AccountsForm" UNITNAME="accounts" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="lib.cpp" FORMNAME="" UNITNAME="lib" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="clients.cpp" FORMNAME="ClientsForm" UNITNAME="clients" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="i_clients.cpp" FORMNAME="iClientsForm" UNITNAME="i_clients" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="services.cpp" FORMNAME="ServicesForm" UNITNAME="services" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="goods.cpp" FORMNAME="GoodsForm" UNITNAME="goods" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="goodsincome.cpp" FORMNAME="GoodsIncomeForm" UNITNAME="goodsincome" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="settings.cpp" FORMNAME="SettingsForm" UNITNAME="settings" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="abtypes.cpp" FORMNAME="AbTypesForm" UNITNAME="abtypes" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="kassa.cpp" FORMNAME="KassaForm" UNITNAME="kassa" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="personal.cpp" FORMNAME="PersonalForm" UNITNAME="personal" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="i_abtypes.cpp" FORMNAME="iAbTypesForm" UNITNAME="i_abtypes" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="visits.cpp" FORMNAME="VisitsForm" UNITNAME="visits" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="i_visits.cpp" FORMNAME="iVisitsForm" UNITNAME="i_visits" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="repBalanse.cpp" FORMNAME="repBalanseForm" UNITNAME="repBalanse" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="dt_interval.cpp" FORMNAME="DateIntervalForm" UNITNAME="dt_interval" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="repNegBalanse.cpp" FORMNAME="repNegBalanseForm" UNITNAME="repNegBalanse" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="repAbServices.cpp" FORMNAME="repAbServicesForm" UNITNAME="repAbServices" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="abparam.cpp" FORMNAME="AbParamForm" UNITNAME="abparam" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="repVisits.cpp" FORMNAME="repVisitsForm" UNITNAME="repVisits" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="repVisitsSPA.cpp" FORMNAME="repVisitsSPAForm" UNITNAME="repVisitsSPA" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="repBalanseSPA.cpp" FORMNAME="repBalanseSPAForm" UNITNAME="repBalanseSPA" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="purchase.cpp" FORMNAME="PurchaseForm" UNITNAME="purchase" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="repSells.cpp" FORMNAME="repSellsForm" UNITNAME="repSells" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="balanse.cpp" FORMNAME="BalanseForm" UNITNAME="balanse" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="servicegoods.cpp" FORMNAME="ServiceGoodsForm" UNITNAME="servicegoods" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="bath.cpp" FORMNAME="BathForm" UNITNAME="bath" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="repGoodsSPA.cpp" FORMNAME="repGoodsSPAForm" UNITNAME="repGoodsSPA" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="SevenZipVCL.pas" FORMNAME="" UNITNAME="SevenZipVCL" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="pwd.cpp" FORMNAME="PwdForm" UNITNAME="pwd" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="barber.cpp" FORMNAME="BarberForm" UNITNAME="barber" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="nail.cpp" FORMNAME="NailForm" UNITNAME="nail" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="sells.cpp" FORMNAME="SellsForm" UNITNAME="sells" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="calendar.cpp" FORMNAME="CalendarForm" UNITNAME="calendar" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="rescaltime.cpp" FORMNAME="RescalTimeForm" UNITNAME="rescaltime" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="fitgroup.cpp" FORMNAME="FitGroupForm" UNITNAME="fitgroup" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="i_fitgroup.cpp" FORMNAME="iFitGroupForm" UNITNAME="i_fitgroup" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="fitshedule.cpp" FORMNAME="FitSheduleForm" UNITNAME="fitshedule" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="dm_main.cpp" FORMNAME="dmMain" UNITNAME="dm_main" CONTAINERID="CCompiler" DESIGNCLASS="TDataModule" LOCALCOMMAND=""/>
+      <FILE FILENAME="gservlist.cpp" FORMNAME="GSListForm" UNITNAME="gservlist" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="cosmetic.cpp" FORMNAME="CosmeticForm" UNITNAME="cosmetic" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="bills.cpp" FORMNAME="BillsForm" UNITNAME="bills" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="rescontrol.cpp" FORMNAME="ResControlForm" UNITNAME="rescontrol" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="sync.cpp" FORMNAME="" UNITNAME="sync" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="repAdWorkDay.cpp" FORMNAME="RepAdWorkDayForm" UNITNAME="repAdWorkDay" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="discard.cpp" FORMNAME="DisCardForm" UNITNAME="discard" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="visitsbath.cpp" FORMNAME="VisitsBathForm" UNITNAME="visitsbath" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="kkm.cpp" FORMNAME="" UNITNAME="kkm" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="kkm_outcome.cpp" FORMNAME="KKMOutForm" UNITNAME="kkm_outcome" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+  </FILELIST>
+  <BUILDTOOLS>
+  </BUILDTOOLS>
+
+  <IDEOPTIONS>
+[Version Info]
+IncludeVerInfo=1
+AutoIncBuild=0
+MajorVer=2017
+MinorVer=9
+Release=19
+Build=1745
+Debug=0
+PreRelease=0
+Special=0
+Private=0
+DLL=0
+Locale=1049
+CodePage=1251
+
+[Version Info Keys]
+CompanyName=Gizmo Factory
+FileDescription=
+FileVersion=2017.9.19.1745
+InternalName=
+LegalCopyright=
+LegalTrademarks=
+OriginalFilename=
+ProductName=
+ProductVersion=2.1
+Comments=
+
+[Excluded Packages]
+c:\program files (x86)\borland\cbuilder6\Bin\dclite60.bpl=Borland Integrated Translation Environment
+
+[HistoryLists\hlIncludePath]
+Count=4
+Item0=D:\panacea;C:\Program Files (x86)\Borland\CBuilder6\Projects;D:\Borland\CBuilder6\Projects;C:\Program Files\Borland\CBuilder6\Projects;C:\Documents and Settings\zax\Рабочий стол\panacea;$(BCB)\include;$(BCB)\include\vcl
+Item1=C:\Program Files (x86)\Borland\CBuilder6\Projects;D:\Borland\CBuilder6\Projects;C:\Program Files\Borland\CBuilder6\Projects;C:\Documents and Settings\zax\Рабочий стол\panacea;$(BCB)\include;$(BCB)\include\vcl
+Item2=D:\Borland\CBuilder6\Projects;C:\Program Files\Borland\CBuilder6\Projects;C:\Documents and Settings\zax\Рабочий стол\panacea;$(BCB)\include;$(BCB)\include\vcl
+Item3=C:\Program Files\Borland\CBuilder6\Projects;C:\Documents and Settings\zax\Рабочий стол\panacea;$(BCB)\include;$(BCB)\include\vcl
+
+[HistoryLists\hlLibraryPath]
+Count=5
+Item0=D:\panacea;C:\Program Files (x86)\Borland\CBuilder6\Projects;$(BCB)\Projects\Lib;D:\Borland\CBuilder6\Projects;C:\Program Files\Borland\CBuilder6\Projects;C:\Documents and Settings\zax\Рабочий стол\panacea;$(BCB)\lib\obj;$(BCB)\lib
+Item1=C:\Program Files (x86)\Borland\CBuilder6\Projects;$(BCB)\Projects\Lib;D:\Borland\CBuilder6\Projects;C:\Program Files\Borland\CBuilder6\Projects;C:\Documents and Settings\zax\Рабочий стол\panacea;$(BCB)\lib\obj;$(BCB)\lib
+Item2=$(BCB)\Projects\Lib;D:\Borland\CBuilder6\Projects;C:\Program Files\Borland\CBuilder6\Projects;C:\Documents and Settings\zax\Рабочий стол\panacea;$(BCB)\lib\obj;$(BCB)\lib
+Item3=D:\Borland\CBuilder6\Projects;C:\Program Files\Borland\CBuilder6\Projects;C:\Documents and Settings\zax\Рабочий стол\panacea;$(BCB)\lib\obj;$(BCB)\lib
+Item4=C:\Program Files\Borland\CBuilder6\Projects;C:\Documents and Settings\zax\Рабочий стол\panacea;$(BCB)\lib\obj;$(BCB)\lib
+
+[HistoryLists\hlDebugSourcePath]
+Count=1
+Item0=$(BCB)\source\vcl
+
+[Debugging]
+DebugSourceDirs=$(BCB)\source\vcl
+
+[Parameters]
+RunParams=
+Launcher=
+UseLauncher=0
+DebugCWD=
+HostApplication=
+RemoteHost=
+RemotePath=
+RemoteLauncher=
+RemoteCWD=
+RemoteDebug=0
+
+[Compiler]
+ShowInfoMsgs=0
+LinkDebugVcl=0
+LinkCGLIB=0
+
+[CORBA]
+AddServerUnit=1
+AddClientUnit=1
+PrecompiledHeaders=1
+  </IDEOPTIONS>
+</PROJECT>

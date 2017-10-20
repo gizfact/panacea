@@ -1,0 +1,12 @@
+CREATE TABLE SYNCDEL
+(
+  ID Bigint NOT NULL,
+  NAME Varchar(16) NOT NULL
+);
+
+CREATE TABLE SYNCMAIL
+(
+  ID Bigint NOT NULL,
+  CDATE Decimal(18,13),
+  EMAIL Varchar(64) NOT NULL
+);

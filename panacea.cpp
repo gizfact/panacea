@@ -1,0 +1,125 @@
+//---------------------------------------------------------------------------
+#include <vcl.h>
+#pragma hdrstop
+//---------------------------------------------------------------------------
+USEFORM("main.cpp", MainForm);
+USEFORM("login.cpp", LoginForm);
+USEFORM("accounts.cpp", AccountsForm);
+USEFORM("clients.cpp", ClientsForm);
+USEFORM("i_clients.cpp", iClientsForm);
+USEFORM("services.cpp", ServicesForm);
+USEFORM("goods.cpp", GoodsForm);
+USEFORM("goodsincome.cpp", GoodsIncomeForm);
+USEFORM("settings.cpp", SettingsForm);
+USEFORM("abtypes.cpp", AbTypesForm);
+USEFORM("kassa.cpp", KassaForm);
+USEFORM("personal.cpp", PersonalForm);
+USEFORM("i_abtypes.cpp", iAbTypesForm);
+USEFORM("visits.cpp", VisitsForm);
+USEFORM("i_visits.cpp", iVisitsForm);
+USEFORM("repBalanse.cpp", repBalanseForm);
+USEFORM("dt_interval.cpp", DateIntervalForm);
+USEFORM("repNegBalanse.cpp", repNegBalanseForm);
+USEFORM("repAbServices.cpp", repAbServicesForm);
+USEFORM("abparam.cpp", AbParamForm);
+USEFORM("repVisits.cpp", repVisitsForm);
+USEFORM("repVisitsSPA.cpp", repVisitsSPAForm);
+USEFORM("repBalanseSPA.cpp", repBalanseSPAForm);
+USEFORM("purchase.cpp", PurchaseForm);
+USEFORM("repSells.cpp", repSellsForm);
+USEFORM("balanse.cpp", BalanseForm);
+USEFORM("servicegoods.cpp", ServiceGoodsForm);
+USEFORM("bath.cpp", BathForm);
+USEFORM("repGoodsSPA.cpp", repGoodsSPAForm);
+USEFORM("pwd.cpp", PwdForm);
+USEFORM("barber.cpp", BarberForm);
+USEFORM("nail.cpp", NailForm);
+USEFORM("sells.cpp", SellsForm);
+USEFORM("calendar.cpp", CalendarForm);
+USEFORM("rescaltime.cpp", RescalTimeForm);
+USEFORM("fitgroup.cpp", FitGroupForm);
+USEFORM("i_fitgroup.cpp", iFitGroupForm);
+USEFORM("fitshedule.cpp", FitSheduleForm);
+USEFORM("dm_main.cpp", dmMain); /* TDataModule: File Type */
+USEFORM("gservlist.cpp", GSListForm);
+USEFORM("cosmetic.cpp", CosmeticForm);
+USEFORM("bills.cpp", BillsForm);
+USEFORM("rescontrol.cpp", ResControlForm);
+USEFORM("repAdWorkDay.cpp", RepAdWorkDayForm);
+USEFORM("discard.cpp", DisCardForm);
+USEFORM("visitsbath.cpp", VisitsBathForm);
+USEFORM("kkm_outcome.cpp", KKMOutForm);
+//---------------------------------------------------------------------------
+AnsiString _AppPath;
+AnsiString _AppName;
+
+static const char *_pMutexStr = "Panacea";
+//---------------------------------------------------------------------------
+HANDLE CheckInstance(const char *name)
+{
+    HANDLE Mutex = CreateMutex(NULL,true,_pMutexStr);
+    int Error = GetLastError();
+    if(Error)
+        return 0;
+    return Mutex;
+}
+//---------------------------------------------------------------------------
+WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
+{
+    HANDLE Mutex = 0;
+
+    try
+    {
+        Mutex = CheckInstance(_pMutexStr);
+        if (!Mutex)
+        {
+            ReleaseMutex(Mutex);
+            return 0;
+        }
+
+        char fileName[512];
+        GetModuleFileName(NULL,fileName,512);
+        _AppPath = fileName;
+
+        char *p = strrchr(fileName,'\\');
+        if(!p)
+        {
+            _AppName = fileName;
+            _AppPath = "";
+        }
+        else
+        {
+            unsigned pos = p - fileName;
+            _AppName = p + 1;
+            _AppPath = _AppPath.SubString(1,pos + 1);
+        }
+
+        if(_AppName != "panacea.exe")
+        {
+            Application->MessageBox("AppName changed","Error",IDOK);
+            return 0;
+        }
+
+        Application->Initialize();
+        Application->CreateForm(__classid(TMainForm), &MainForm);
+         Application->Run();
+    }
+    catch(Exception &exception)
+    {
+         Application->ShowException(&exception);
+    }
+    catch (...)
+    {
+         try
+         {
+             throw Exception("");
+         }
+         catch (Exception &exception)
+         {
+             Application->ShowException(&exception);
+         }
+    }
+
+    return 0;
+}
+//---------------------------------------------------------------------------

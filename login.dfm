@@ -1,0 +1,82 @@
+object LoginForm: TLoginForm
+  Left = 642
+  Top = 252
+  BorderIcons = []
+  BorderStyle = bsDialog
+  Caption = #1040#1074#1090#1086#1088#1080#1079#1072#1094#1080#1103
+  ClientHeight = 120
+  ClientWidth = 284
+  Color = clBtnFace
+  Font.Charset = RUSSIAN_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Verdana'
+  Font.Style = []
+  FormStyle = fsStayOnTop
+  OldCreateOrder = False
+  Position = poDesktopCenter
+  PixelsPerInch = 96
+  TextHeight = 13
+  object laLogin: TLabel
+    Left = 8
+    Top = 10
+    Width = 38
+    Height = 13
+    Caption = #1051#1086#1075#1080#1085
+    Font.Charset = RUSSIAN_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Verdana'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object laPassword: TLabel
+    Left = 8
+    Top = 34
+    Width = 49
+    Height = 13
+    Caption = #1055#1072#1088#1086#1083#1100
+    Font.Charset = RUSSIAN_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Verdana'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object btnOk: TButton
+    Left = 64
+    Top = 80
+    Width = 75
+    Height = 25
+    Caption = 'OK'
+    Default = True
+    TabOrder = 2
+    OnClick = btnOkClick
+  end
+  object btnCancel: TButton
+    Left = 144
+    Top = 80
+    Width = 75
+    Height = 25
+    Cancel = True
+    Caption = #1042#1099#1093#1086#1076
+    ModalResult = 2
+    TabOrder = 3
+    OnClick = btnCancelClick
+  end
+  object edLogin: TEdit
+    Left = 64
+    Top = 8
+    Width = 209
+    Height = 21
+    TabOrder = 0
+  end
+  object edPassword: TEdit
+    Left = 64
+    Top = 32
+    Width = 209
+    Height = 21
+    PasswordChar = '#'
+    TabOrder = 1
+  end
+end

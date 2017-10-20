@@ -1,0 +1,104 @@
+SET TERM ^ ;
+CREATE TRIGGER TRI_ABONEMENTS_UPD FOR ABONEMENTS ACTIVE
+BEFORE UPDATE POSITION 0
+AS 
+BEGIN 
+    /* enter trigger code here */ 
+	if(OLD.SYNC = NEW.SYNC) then
+	begin
+		NEW.SYNC=0;
+	end
+END^
+SET TERM ; ^
+
+SET TERM ^ ;
+CREATE TRIGGER TRI_ABTYPES_UPD FOR ABTYPES ACTIVE
+BEFORE UPDATE POSITION 0
+AS 
+BEGIN 
+    /* enter trigger code here */ 
+    if(OLD.SYNC = NEW.SYNC) then
+	begin
+		NEW.SYNC=0;
+	end
+END^
+SET TERM ; ^
+
+SET TERM ^ ;
+CREATE TRIGGER TRI_CLIENTS_UPD FOR CLIENTS ACTIVE
+BEFORE UPDATE POSITION 0
+AS 
+BEGIN 
+    /* enter trigger code here */ 
+	if(OLD.SYNC = NEW.SYNC) then
+	begin
+		NEW.SYNC=0;
+	end
+END^
+SET TERM ; ^
+
+SET TERM ^ ;
+CREATE TRIGGER TRI_FITGROUP_UPD FOR FITGROUP ACTIVE
+BEFORE UPDATE POSITION 0
+AS 
+BEGIN 
+    /* enter trigger code here */ 
+	if(OLD.SYNC = NEW.SYNC) then
+	begin
+		NEW.SYNC=0;
+	end
+END^
+SET TERM ; ^
+
+SET TERM ^ ;
+CREATE TRIGGER TRI_PERSONAL_UPD FOR PERSONAL ACTIVE
+BEFORE UPDATE POSITION 0
+AS 
+BEGIN 
+    /* enter trigger code here */ 
+	if(OLD.SYNC = NEW.SYNC) then
+	begin
+		NEW.SYNC=0;
+	end
+END^
+SET TERM ; ^
+
+SET TERM ^ ;
+CREATE TRIGGER TRI_RESERVE_UPD FOR RESERVE ACTIVE
+BEFORE UPDATE POSITION 0
+AS 
+BEGIN 
+    /* enter trigger code here */ 
+	if(OLD.SYNC = NEW.SYNC) then
+	begin
+		NEW.SYNC=0;
+	end
+END^
+SET TERM ; ^
+
+SET TERM ^ ;
+CREATE TRIGGER TRI_SERVICES_UPD FOR SERVICES ACTIVE
+BEFORE UPDATE POSITION 0
+AS 
+BEGIN 
+    /* enter trigger code here */ 
+	if(OLD.SYNC = NEW.SYNC) then
+	begin
+		NEW.SYNC=0;
+	end
+END^
+SET TERM ; ^
+
+SET TERM ^ ;
+CREATE TRIGGER TRI_VISITS_UPD FOR VISITS ACTIVE
+BEFORE UPDATE POSITION 0
+AS 
+BEGIN 
+    /* enter trigger code here */ 
+	if(OLD.SYNC = NEW.SYNC) then
+	begin
+		NEW.SYNC=0;
+	end
+END^
+SET TERM ; ^
+
