@@ -1935,8 +1935,8 @@ void __fastcall TClientsForm::FormShow(TObject *Sender)
         spbClosingSPA->Visible = true;
         spbClosingBath->Visible = true;
 
-        imGreen->Visible = true;
-        imRed->Visible = true;
+        //imGreen->Visible = true;
+        //imRed->Visible = true;
         cbAlive->Visible = true;
         cbNotAlive->Visible = true;
 
@@ -7233,8 +7233,8 @@ bool __fastcall TClientsForm::LoadKassa(__int64 BillID)
         group_cnt = ATOF(pRet[pos+4].c_str());
         total = ATOF(pRet[pos+6].c_str());
 
-
-        KassaForm->KassaOps |= ATOI(pRet[pos+5].c_str());
+        h = ATOI(pRet[pos+5].c_str());
+        KassaForm->KassaOps |= h;
 
         if((int)KassaForm->Counter >= KassaForm->IDs.Length)
             KassaForm->IDs.Length = KassaForm->IDs.Length + 10;
@@ -7248,19 +7248,19 @@ bool __fastcall TClientsForm::LoadKassa(__int64 BillID)
         if(KassaForm->KassaOps & SELLOP_SPA_VISIT)
             KassaForm->sgKassa->Cells[0][KassaForm->sgKassa->Row] = "услуга SPA";
         double discount = ATOF(pRet[pos+7].c_str());
-        if(KassaForm->KassaOps & SELLOP_BATH)
+        if(h & SELLOP_BATH)
         {
             KassaForm->sgKassa->Cells[0][KassaForm->sgKassa->Row] = "банные услуги";
             // Подправим имя servName
             h = ATOI(pRet[pos+10].c_str());
             if(h == 0)
-                servName = "[Баня]Жадеит";
+                servName = "Баня~Жадеит";
             else if(h == 1)
-                servName = "[Баня]Малиновый кварцит";
+                servName = "Баня~Малиновый кварцит";
             else if(h == 2)
-                servName = "[Баня]Хаммам";
+                servName = "Баня~Хаммам";
             else
-                servName = "[Баня]";
+                servName = "Баня";
         }
             //discount = 0;
 
