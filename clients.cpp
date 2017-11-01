@@ -4531,7 +4531,7 @@ void __fastcall TClientsForm::SpisFromSPA(__int64 RID,bool bath,bool forcash)
             return;
         }
 
-        SQL_iniUpdate(DBName,"Reserve",ReserveIDs[sgReserve->Row-1]);
+        SQL_iniUpdate(DBName,"Reserve",RID);
         SQL_exeUpdate("Status",2);
 
         if(SQL_CommitTransaction() == SQLITE_OK)

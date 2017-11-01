@@ -175,7 +175,7 @@ void __fastcall TGSListForm::btSpisClick(TObject *Sender)
     // —писать Ѕаню, а может и не только... за нал. расчет
     AnsiString retString;
 
-    __int64 VSID, BID, RID = ClientsForm->ReserveIDs[ClientsForm->sgReserve->Row-1];
+    __int64 VSID, BID, RID = ClientsForm->ReserveIDs[ClientsForm->sgReserve->Row - 1];
     if(!RID) return;
 
     SQL_exefun(NULL,("select Tag from Reserve,Services where ServiceID=Services.RowID and Reserve.RowID="+AnsiString(RID)).c_str(),&retString);
