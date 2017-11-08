@@ -672,21 +672,20 @@ static int _keycollectfun(void *NotUsed,int argc,char **argv,char **azColName)
 unsigned __fastcall SQL_fldKeyCollect(const char *dbname,const char *fName,const char *sql_from,__int64 **pIDs,AnsiString **pFld,bool ToAnsi,bool FirstZero,bool Distinct)
 {
     // sql - select Field from ....
-    AnsiString s;
+    int prefix;
+    AnsiString key = "RowID", s = fName;
 
-    //if(Distinct)
-    //    s = (AnsiString)"select count(distinct RowID) " + sql_from;
-    //else
-    //    s = (AnsiString)"select count(*) " + sql_from;
+    if((prefix = s.Pos('.')) > 0)
+        key = s.SubString(1, prefix) + key;
 
     if(Distinct)
-        s = (AnsiString)"select count(distinct RowID) from (select RowID," + fName + " " + sql_from + ")";
+        s = (AnsiString)"select count(distinct " + key + ") from (select " + key + "," + fName + " " + sql_from + ")";
     else
-        s = (AnsiString)"select count(*) from (select RowID," + fName + " " + sql_from + ")";
+        s = (AnsiString)"select count(*) from (select " + key + "," + fName + " " + sql_from + ")";
 
     SQL_exefun(dbname,s.c_str(),&_exefun_Ret);
 
-    unsigned cnt = atoi(_exefun_Ret.c_str());
+    int cnt = atoi(_exefun_Ret.c_str());
     if(FirstZero) cnt++;
     if(!cnt)
     {
@@ -714,16 +713,26 @@ unsigned __fastcall SQL_fldKeyCollect(const char *dbname,const char *fName,const
         _pCollector++;
     }
 
-    //if(Distinct)
-    //    s = "select distinct RowID,";
-    //else
-    //    s = "select RowID,";
-
     if(Distinct)
-        s = AnsiString("select distinct RowID,") + fName + " from (select RowID," + fName + " " + sql_from + ")";
+    {
+        if(prefix)
+        {
+            s = fName;
+            s = "select distinct RowID," + s.SubString(prefix + 1, s.Length() - prefix) + " from (select " + key + "," + fName + " " + sql_from + ")";
+        }
+        else
+            s = "select distinct " + key + "," + fName + " from (select " + key + "," + fName + " " + sql_from + ")";
+    }
     else
-        s = AnsiString("select RowID,") + fName + " from (select RowID," + fName + " " + sql_from + ")";
-        //s = AnsiString("select RowID,") + fName + " from (select RowID," + fName + " ";
+    {
+        if(prefix)
+        {
+            s = fName;
+            s = "select RowID," + s.SubString(prefix + 1, s.Length() - prefix) + " from (select " + key + "," + fName + " " + sql_from + ")";
+        }
+        else
+            s = "select " + key + "," + fName + " from (select " + key + "," + fName + " " + sql_from + ")";
+    }
 
     _fToAnsi = ToAnsi;
     SQL_exe(dbname,s.c_str(),_keycollectfun);
