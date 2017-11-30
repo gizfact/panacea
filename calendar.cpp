@@ -82,8 +82,10 @@ void __fastcall TCalendarForm::FullUpdate(void)
     if(!cbServices->Items->Objects[cbServices->ItemIndex])
     {
         // Admins
-        //PersonCount = SQL_fldKeyCollect(DBName,"StarsUser","from Stars where StarsLock=0 and RowID!=4 order by StarsUser",&pPersonIDs,&pPersonNames);
-        PersonCount = SQL_fldKeyCollect(DBName,"a.StarsUser",
+        if(TDateTime().CurrentDate() < CurrentFDay)
+            PersonCount = SQL_fldKeyCollect(DBName,"StarsUser","from Stars where StarsLock=0 and RowID!=4 order by StarsUser",&pPersonIDs,&pPersonNames);
+        else
+            PersonCount = SQL_fldKeyCollect(DBName,"a.StarsUser",
         ("from Stars a inner join Calendar b on a.RowID=-b.PersonID where b.CalendarYear=" + AnsiString(year) +
         " and b.CalendarMonth=" + AnsiString(month) +
         " and a.RowID!=4 and b.Days+b.HDays!=0 order by a.StarsUser").c_str(),&pPersonIDs,&pPersonNames);
