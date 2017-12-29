@@ -145,8 +145,8 @@
 IncludeVerInfo=1
 AutoIncBuild=0
 MajorVer=2017
-MinorVer=11
-Release=30
+MinorVer=12
+Release=29
 Build=1410
 Debug=0
 PreRelease=0
@@ -159,7 +159,7 @@ CodePage=1251
 [Version Info Keys]
 CompanyName=Gizmo Factory
 FileDescription=
-FileVersion=2017.11.30.1410
+FileVersion=2017.12.29.1410
 InternalName=
 LegalCopyright=
 LegalTrademarks=

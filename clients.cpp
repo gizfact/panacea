@@ -761,14 +761,16 @@ static int abonements_select(void *NotUsed, int argc, char **argv, char **azColN
     else
         visits = 0;
 
-    if(fixsum > 0.0 && !visits)
+
+    if(fixsum >= 0.0 && !visits)
     {
         ClientsForm->sgAbonements->Cells[4][CounterAbonements] = FormatFloat(MoneyFormat,price).TrimLeft();
         ClientsForm->sgAbonements->Cells[5][CounterAbonements] = atoi(retString.c_str());
 
         return 0;
     }
-    else if(fixsum < 0.0)
+
+    if(fixsum < 0.0)
     {
         ClientsForm->sgAbonements->Cells[4][CounterAbonements] = FormatFloat(MoneyFormat,price).TrimLeft();
         ClientsForm->sgAbonements->Cells[5][CounterAbonements] = "";

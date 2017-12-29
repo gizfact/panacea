@@ -302,8 +302,8 @@ void __fastcall TiVisitsForm::bOKClick(TObject *Sender)
         // Поискать старый абонемент
         if(SQL_BeginTransaction() != SQLITE_OK) return;
 
-        AnsiString pRow[4];
-        SQL_exefunrow(DBName,("select first 1 RowID,Price,AbonementsCount,FixSum from Abonements where Closed=0 and FixSum>=0 and ClientID="+(AnsiString)ClientID+" order by BegDate,CDate").c_str(),4,pRow);
+        AnsiString pRow[5];
+        SQL_exefunrow(DBName,("select first 1 RowID,Price,AbonementsCount,FixSum,Name from Abonements where Closed=0 and FixSum>=0 and ClientID="+(AnsiString)ClientID+" order by BegDate,CDate").c_str(),5,pRow);
 
         __int64 AbID = _atoi64(pRow[0].c_str());
 
@@ -326,6 +326,9 @@ void __fastcall TiVisitsForm::bOKClick(TObject *Sender)
         {
             if(count != 0.0)
                 SQL_addInsert("Price",price/count);
+            // Может быть клубная карта
+            else if(pRow[4].Pos("Клубная карта") > 0)
+                SQL_addInsert("Price",0);
             else
             {
                 SQL_CancelTransaction();

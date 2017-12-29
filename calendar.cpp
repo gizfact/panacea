@@ -82,7 +82,10 @@ void __fastcall TCalendarForm::FullUpdate(void)
     if(!cbServices->Items->Objects[cbServices->ItemIndex])
     {
         // Admins
-        if(TDateTime().CurrentDate() < CurrentFDay)
+        unsigned short lyear, lmonth, lday;
+        TDateTime().CurrentDate().DecodeDate(&lyear,&lmonth,&lday);
+
+        if((lyear * 12 + lmonth) <= (year * 12 + month))
             PersonCount = SQL_fldKeyCollect(DBName,"StarsUser","from Stars where StarsLock=0 and RowID!=4 order by StarsUser",&pPersonIDs,&pPersonNames);
         else
             PersonCount = SQL_fldKeyCollect(DBName,"a.StarsUser",
