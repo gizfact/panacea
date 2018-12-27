@@ -40,9 +40,12 @@
 #include "sync.h"
 
 #include "repAdWorkDay.h"
+#include "repResCheck.h"
 
 #include "bills.h"
+
 #include "kkm.h"
+
 
 #include <math.h>
 //---------------------------------------------------------------------------
@@ -108,6 +111,46 @@ bool ReserveFlag = false;
 
 int KKM_LINK = 0;
 int KKM_USE = 0;
+//---------------------------------------------------------------------------
+static int represcheck_select(void *NotUsed = NULL, int argc = 0, char **argv = NULL, char **azColName = NULL)
+{
+    static int cnt = 0;
+
+    if(argc)
+    {
+        MainForm->pResCheck[cnt].pDate = TDateTime(argv[0],TDateTime::DateTime).FormatString("dd.mm.yy hh:nn");
+        //TDateTime(atof(argv[0])).FormatString("dd.mm.yy hh:nn");
+        MainForm->pResCheck[cnt].pUser = argv[1]? argv[1] : "?";
+        MainForm->pResCheck[cnt].pCDate = TDateTime(argv[2],TDateTime::DateTime).FormatString("dd.mm.yy");
+        //TDateTime(atof(argv[2])).FormatString("dd.mm.yy");
+        MainForm->pResCheck[cnt].pGroup = argv[3]? argv[3] : "?";
+        MainForm->pResCheck[cnt].pClient = argv[4];
+        MainForm->pResCheck[cnt].pService = argv[5];
+        MainForm->pResCheck[cnt].pStatus = argv[6];
+
+        if(argv[7] && argv[7][0])
+        {
+            char *p = strtok(argv[7],"|");
+            if(!p) MainForm->pResCheck[cnt].pDeleted = argv[7];
+            else
+            {
+                MainForm->pResCheck[cnt].pDeleted = p;
+                p = strtok(NULL,"|");
+                if(p) MainForm->pResCheck[cnt].pDeleted += ", " + TDateTime(atof(p)).FormatString("dd.mm.yy hh:nn");
+            }
+        }
+
+        repResCheckForm->QRlines->Items->Add(cnt);
+        cnt++;
+
+        MainForm->pbProgress->StepIt();
+        Application->ProcessMessages();
+    }
+    else
+        cnt = 0;
+
+    return 0;
+}
 //---------------------------------------------------------------------------
 static int repworkday_select(void *NotUsed, int argc, char **argv, char **azColName)
 {
@@ -389,8 +432,6 @@ __fastcall TMainForm::TMainForm(TComponent* Owner)
 //---------------------------------------------------------------------------
 void __fastcall TMainForm::FormShow(TObject *Sender)
 {
-    //int res;
-
     if(kkm_init() != 0)
     {
         KKM_LINK = 0;
@@ -448,7 +489,7 @@ void __fastcall TMainForm::FormShow(TObject *Sender)
         //mmnCalendar->Visible = true;
         mmnFitGroup->Visible = true;
         mmnBalCheck->Visible = true;
-
+        mmnResCheck->Visible = true;
         
 
         NegBalanseFlag = true;
@@ -470,6 +511,7 @@ void __fastcall TMainForm::FormShow(TObject *Sender)
         if(UserID == 4)
         {
             mmnBalCheck->Visible = true;
+            mmnResCheck->Visible = true;
             //mmnCalendar->Visible = true;
             //  mmnFitGroup->Visible = true;
         }
@@ -539,18 +581,18 @@ void __fastcall TMainForm::FormShow(TObject *Sender)
 
     // Сервак, автосписание здесь
     if(KassaBillID == -1)
+    {
         tiReserve->Enabled = true;
+        tiResBath->Enabled = true;
+    }
 
     if(!SyncFlag) return;
-
 
     tiSync->Interval = SyncPeriod * 60000;
     pSync = new TSync(true);
     tiSync->Enabled = true;
 
     //bool x = dmMain->SendMail("it@aptekar76.ru","Привет!","Это проверка почты");
-
-    //x = 0;
 }
 //---------------------------------------------------------------------------
 void __fastcall TMainForm::mmnUserlistClick(TObject *Sender)
@@ -906,6 +948,7 @@ TDateTime zEndDate[2];
 double zFixSum[2];
 unsigned zCounter;
 
+/*
 static int abs_patch(void *NotUsed, int argc, char **argv, char **azColName)
 {
     __int64 ID = (argv[0])? _atoi64(argv[0]) : 0;
@@ -932,7 +975,7 @@ static int abs_patch(void *NotUsed, int argc, char **argv, char **azColName)
     zCounter++;
 
     return 0;
-}
+}*/
 //---------------------------------------------------------------------------
 void __fastcall TMainForm::mmnRepVisitsClick(TObject *Sender)
 {
@@ -1331,6 +1374,9 @@ void __fastcall TMainForm::DelClients1Click(TObject *Sender)
     SQL_exe(DBName,"delete from Abonements where ClientID not in (select RowID from Clients)");
     SQL_exe(DBName,"delete from Visits where AbonementID not in (select RowID from Abonements)");
 
+    SQL_exe(DBName,"delete from Abonements_Bath where ClientID not in (select RowID from Clients)");
+    SQL_exe(DBName,"delete from Visits_Bath where AbonementID not in (select RowID from Abonements)");
+
     SQL_exe(DBName,"delete from Abonements_SPA where ClientID not in (select RowID from Clients)");
     SQL_exe(DBName,"delete from Visits_SPA where ClientID=0 and AbonementID not in (select RowID from Abonements_SPA)");
 
@@ -1551,8 +1597,9 @@ void __fastcall TMainForm::mmnRepVisitsSPAClick(TObject *Sender)
                 {
                     if(pprice == 0)
                     {
-                        // Групповуха
-
+                        // Групповуха??
+                        if(price > 0)
+                            pLines[2] = FormatFloat(MoneyFormat,price) + " / " + FormatFloat(MoneyFormat,0);
                     }
                     else
                         pLines[2] = FormatFloat(MoneyFormat,pprice) + " / " + FormatFloat(MoneyFormat,price-pprice);
@@ -5718,7 +5765,6 @@ void __fastcall TMainForm::mmnRepSellsClick(TObject *Sender)
 void __fastcall TMainForm::mmnRepWorkDayClick(TObject *Sender)
 {
     // Отчет Администраторы
-    //if(!AdminMode) return;
 
     bool Period = true;
 
@@ -5796,7 +5842,7 @@ void __fastcall TMainForm::mmnRepWorkDayClick(TObject *Sender)
     repClientsCounter = 0;
 
     AnsiString sql = "select a.UserID,b.StarsUser,min(a.BegDate),max(a.EndDate) from Sessions a "
-    "left outer join Stars b on a.UserID=b.RowID where a.UserID not in (0,4) and a.BegDate>=";
+    "left join Stars b on a.UserID=b.RowID where a.UserID not in (0,4) and a.BegDate>=";
     sql += Start;
     sql += " and BegDate<";
     sql += Finish;
@@ -5811,13 +5857,9 @@ void __fastcall TMainForm::mmnRepWorkDayClick(TObject *Sender)
     {
         RepAdWorkDayForm->QRlines->Items->Add(repClientsCounter);
 
-
-
         pbProgress->StepIt();
         Application->ProcessMessages();
     }
-
-
 
     if(Period)
         RepAdWorkDayForm->QRHeader->Caption = "Отчет по рабочим часам Администраторов с "+bdt.DateString()+" по "+(edt-1).DateString();
@@ -5829,15 +5871,10 @@ void __fastcall TMainForm::mmnRepWorkDayClick(TObject *Sender)
     pbProgress->Visible = false;
     RepAdWorkDayForm->QuickRep1->Preview();
 
-    //PDEL(repClientsIDs);
     PDEL(repClientsFNames);
     PDEL(repClientsSNames);
     PDEL(repClientsTNames);
     PDEL(repClientsBegBalanse);
-    //PDEL(repClientsToBalanse);
-    //PDEL(repClientsToBalanseBN);
-    //PDEL(repClientsFromBalanse);
-    //PDEL(repClientsEndBalanse);
 
     delete RepAdWorkDayForm;
 
@@ -6558,6 +6595,838 @@ void __fastcall TMainForm::N24Click(TObject *Sender)
     Application->MessageBox(("Обработано " + AnsiString(pList->Count) + " записей.").c_str(), "", MB_OK);
 
     delete pList;
+}
+//---------------------------------------------------------------------------
+void __fastcall TMainForm::N25Click(TObject *Sender)
+{
+    SQL_exefun(DBName,"select SettingsVal from Settings where SettingsKey='NoAbsToRep'",&retString);
+    bool OnlyAbsToRep = atoi(retString.c_str()) == 0;
+
+    bool Period = true;
+
+    if(AdminMode || UserGrants[12] != '0')
+    {
+        SQL_exefun(DBName,"select SettingsVal from Settings where SettingsKey='repVisitsPeriod'",&retString);
+        Period = !(atoi(retString.c_str()) == 0);
+    }
+    
+    TDateTime bdt;
+    TDateTime edt;
+
+    if(Period)
+    {
+        DateIntervalForm = new TDateIntervalForm(this);
+
+        DTI_BegDate = Now();
+        DTI_EndDate = DTI_BegDate;
+        FormResult = 0;
+        DateIntervalForm->ShowModal();
+        delete DateIntervalForm;
+
+        if(FormResult != 1) return;
+        bdt = DTI_BegDate;
+        edt = DTI_EndDate + 1;
+    }
+    else
+    {
+         bdt = Now();
+         edt = bdt + 1;
+    }
+
+    unsigned Start = (int)bdt;
+    unsigned Finish = (int)edt;
+
+    // Нужно собрать связки тренер/занятие
+    AnsiString *psPID, *psPID2;
+
+    AnsiString sql = "from Visits_Bath where VisitsDate>=";
+    sql += Start;
+    sql += " and VisitsDate<";
+    sql += Finish;
+    unsigned cnt_visits = SQL_fldCollect(DBName,"PersonID",sql.c_str(),&psPID,false,false,true);
+
+    // и еще по купленным абонементам
+
+    sql = "from Abonements_Bath where CDate>=";
+    sql += Start;
+    sql += " and CDate<";
+    sql += Finish;
+    if(OnlyAbsToRep)
+        sql += " and FixSum>=0";
+    unsigned cnt_abonements = SQL_fldCollect(DBName,"PersonID",sql.c_str(),&psPID2,false,false,true);
+
+    pbProgress->Width = ClientWidth;
+    pbProgress->Height = ClientHeight;
+    pbProgress->Left = 0;
+    pbProgress->Top = 0;
+    pbProgress->Step = 1;
+    pbProgress->Min = 0;
+    pbProgress->Position = 0;
+
+    bool mV[5], mE[5];
+    mV[0] = mmnRefbook->Visible;
+    mV[1] = mmnService->Visible;
+    mV[2] = mmnReport->Visible;
+    mV[3] = mmnAdmin->Visible;
+    mV[4] = mmnGoods->Visible;
+
+    mE[0] = mmnRefbook->Enabled;
+    mE[1] = mmnService->Enabled;
+    mE[2] = mmnReport->Enabled;
+    mE[3] = mmnAdmin->Enabled;
+    mE[4] = mmnGoods->Enabled;
+
+    mmnRefbook->Enabled = false;
+    mmnService->Enabled = false;
+    mmnReport->Enabled = false;
+    mmnAdmin->Enabled = false;
+    mmnGoods->Enabled = false;
+
+    // Склеить вместе
+    unsigned i;
+    bool fZero = false;
+
+    sql = "from Personal where RowID in (0,";
+    for(i = 0; i < cnt_visits; i++)
+    {
+        if(_atoi64(psPID[i].c_str()) == 0)
+            fZero = true;
+
+        sql += (AnsiString(psPID[i]) + ",");
+    }
+
+    for(i = 0; i < cnt_abonements; i++)
+    {
+        if(_atoi64(psPID2[i].c_str()) == 0)
+            fZero = true;
+        else
+            sql += (AnsiString(psPID2[i]) + ",");
+    }
+
+
+    sql.SetLength(sql.Length() - 1);
+
+    sql += ") order by Name,CDate";
+
+    delete [] psPID;
+    delete [] psPID2;
+
+    __int64 *pPIDs;
+
+    unsigned cnt_persons = SQL_fldKeyCollect(DBName,"Name",sql.c_str(),&pPIDs,&psPID,true,fZero);
+
+    if(fZero)
+    {
+        pPIDs[0] = 0;
+        psPID[0] = "без специалиста";
+    }
+
+    if(cnt_persons)
+        pbProgress->Max = cnt_persons - 1;
+    else
+        pbProgress->Max = 0;
+    pbProgress->Visible = true;
+
+    TList *pList = new TList;
+    AnsiString *pLines;
+
+    repVisitsForm = new TrepVisitsForm(this);
+    if(Period)
+        repVisitsForm->QRHeader->Caption = "Отчет по посещениям бани с " + bdt.DateString() + " по " + (edt-1).DateString();
+    else
+        repVisitsForm->QRHeader->Caption = "Отчет по посещениям бани на " + (edt-1).DateString();
+    repVisitsForm->QRCreated->Caption = repCreated(Start < (Finish - 1));
+
+    repVisitsForm->pPrint = pList;
+
+    pList->Add(NULL);
+    repVisitsForm->QRlines->Items->Add("E");
+
+    for(unsigned cnt_p = 0; cnt_p < cnt_persons; cnt_p++)
+    {
+        // Сколько услуг на тренере ?
+
+        AnsiString *psSID, *psSID2;
+
+        sql = "from Visits_Bath where PersonID=";
+        sql += pPIDs[cnt_p];
+        sql += " and VisitsDate>=";
+        sql += Start;
+        sql += " and VisitsDate<";
+        sql += Finish;
+        cnt_visits = SQL_fldCollect(DBName,"ServiceID",sql.c_str(),&psSID,false,false,true);
+
+        sql = "from Abonements_Bath where PersonID=";
+        sql += pPIDs[cnt_p];
+        sql += " and CDate>=";
+        sql += Start;
+        sql += " and CDate<";
+        sql += Finish;
+        if(OnlyAbsToRep)
+            sql += " and FixSum>=0";
+        cnt_abonements = SQL_fldCollect(DBName,"ServiceID",sql.c_str(),&psSID2,false,false,true);
+
+        // Склеить вместе
+        unsigned cnt_services = 0;
+        fZero = false;
+        __int64 *pSIDs = NULL;
+
+        if(cnt_visits + cnt_abonements)
+        {
+            sql = "from Services where RowID in (0,";
+            for(i = 0; i < cnt_visits; i++)
+            {
+                if(_atoi64(psSID[i].c_str()) == 0)
+                    fZero = true;
+                else
+                    sql += (AnsiString(psSID[i]) + ",");
+            }
+
+            for(i = 0; i < cnt_abonements; i++)
+            {
+                if(_atoi64(psSID2[i].c_str()) == 0)
+                    fZero = true;
+                else
+                    sql += (AnsiString(psSID2[i]) + ",");
+            }
+
+            sql.SetLength(sql.Length() - 1);
+            sql += ") order by Name,CDate";
+
+            delete [] psSID;
+            delete [] psSID2;
+
+            cnt_services = SQL_fldKeyCollect(DBName,"Name",sql.c_str(),&pSIDs,&psSID,true,fZero,true);
+
+            if(fZero)
+            {
+                pSIDs[0] = 0;
+                psSID[0] = "не указано";
+            }
+        }
+
+        for(unsigned cnt_s = 0; cnt_s < cnt_services; cnt_s++)
+        {
+            // Соберем отчет - тренер.занятие - посетитель - посещение - абонемент
+            AnsiString *psCID, *psCID2;
+
+            sql = "from Abonements_Bath inner join (select Visits_Bath.AbonementID as AI from Visits_Bath where PersonID=";
+            sql += pPIDs[cnt_p];
+            sql += " and ServiceID=";
+            sql += pSIDs[cnt_s];
+            sql += " and VisitsDate>=";
+            sql += Start;
+            sql += " and VisitsDate<";
+            sql += Finish;
+            sql += ") on RowID=AI";
+
+            cnt_visits = SQL_fldCollect(DBName,"ClientID",sql.c_str(),&psCID,false,false,true);
+
+            sql = "from Abonements_Bath where PersonID=";
+            sql += pPIDs[cnt_p];
+            sql += " and ServiceID=";
+            sql += pSIDs[cnt_s];
+            sql += " and CDate>=";
+            sql += Start;
+            sql += " and CDate<";
+            sql += Finish;
+            if(OnlyAbsToRep)
+                sql += " and FixSum>=0";
+
+            cnt_abonements = SQL_fldCollect(DBName,"ClientID",sql.c_str(),&psCID2,false,false,true);
+
+             __int64 *pCIDs = NULL;
+             unsigned cnt_clients = 0;
+
+            if(cnt_visits + cnt_abonements)
+            {
+                sql = "from Clients where RowID in (0,";
+                for(i = 0; i < cnt_visits; i++)
+                    sql += (AnsiString(psCID[i]) + ",");
+
+                for(i = 0; i < cnt_abonements; i++)
+                    sql += (AnsiString(psCID2[i]) + ",");
+
+                sql.SetLength(sql.Length() - 1);
+                sql += ") order by FullName,CDate";
+
+                delete [] psCID;
+                delete [] psCID2;
+
+                cnt_clients = SQL_fldKeyCollect(DBName,"FullName",sql.c_str(),&pCIDs,&psCID,true,false,true);
+            }
+
+            AnsiString *pLines;
+
+            for(unsigned cnt_c = 0; cnt_c < cnt_clients; cnt_c++)
+            {
+                pLines = new AnsiString[4];
+
+                if(!cnt_c)
+                {
+                    pLines[0] = psPID[cnt_p] + " / " + psSID[cnt_s];
+                    repVisitsForm->QRlines->Items->Add("H");
+                }
+                else
+                    repVisitsForm->QRlines->Items->Add("L");
+
+                pLines[1] = psCID[cnt_c];
+
+                // Посещения
+                sql = "from Visits_Bath where PersonID=";
+                sql += pPIDs[cnt_p];
+                sql += " and ServiceID=";
+                sql += pSIDs[cnt_s];
+                sql += " and VisitsDate>=";
+                sql += Start;
+                sql += " and VisitsDate<";
+                sql += Finish;
+                sql += " and AbonementID in (select RowID from Abonements_Bath where ClientID=";
+                sql += pCIDs[cnt_c];
+                sql += ")";
+
+                cnt_visits = SQL_fldCollect(DBName,"Price",sql.c_str(),&psCID2);
+
+                double price;
+
+                if(cnt_visits)
+                {
+                    price = 0.0;
+                    for(unsigned i = 0; i < cnt_visits; i++)
+                        price += atof(psCID2[i].c_str());
+
+                    delete [] psCID2;
+                    pLines[2] = FormatFloat(MoneyFormat,price) + " (" + cnt_visits + ")";
+                }
+
+                // Абонементы
+                sql = "from Abonements_Bath where PersonID=";
+                sql += pPIDs[cnt_p];
+                sql += " and ServiceID=";
+                sql += pSIDs[cnt_s];
+                sql += " and CDate>=";
+                sql += Start;
+                sql += " and CDate<";
+                sql += Finish;
+                sql += " and ClientID=";
+                sql += pCIDs[cnt_c];
+                if(OnlyAbsToRep)
+                    sql += " and FixSum>=0";
+
+                cnt_abonements = SQL_fldCollect(DBName,"Price",sql.c_str(),&psCID2);
+
+                if(cnt_abonements)
+                {
+                    price = 0.0;
+                    for(unsigned i = 0; i < cnt_abonements; i++)
+                        price += atof(psCID2[i].c_str());
+
+                    delete [] psCID2;
+                    pLines[3] = FormatFloat(MoneyFormat,price) + " (" + cnt_abonements + ")";
+                }
+                
+                pList->Add(pLines);
+
+            }
+
+            pLines = new AnsiString[4];
+            pLines[0] = "Итого:";
+            pList->Add(pLines);
+            repVisitsForm->QRlines->Items->Add("I");
+            pList->Add(NULL);
+            repVisitsForm->QRlines->Items->Add("E");
+
+            delete [] psCID;
+            delete [] pCIDs;
+        }
+
+        delete [] psSID;
+        delete [] pSIDs;
+
+        pbProgress->StepIt();
+        Application->ProcessMessages();
+    }
+
+    delete [] psPID;
+    delete [] pPIDs;
+
+    pbProgress->Visible = false;
+    //Тренер / Занятие
+    repVisitsForm->QRlaServ->Caption = "";
+    repVisitsForm->QuickRep1->Preview();
+
+    AnsiString *pS;
+
+    for(int i = 0; i < pList->Count; i++)
+        if((pS = (AnsiString *)pList->Items[i]) != NULL) delete [] pS;
+        
+    delete pList;
+    delete repVisitsForm;
+
+    mmnRefbook->Visible = mV[0];
+    mmnService->Visible = mV[1];
+    mmnReport->Visible = mV[2];
+    mmnAdmin->Visible = mV[3];
+    mmnGoods->Visible = mV[4];
+
+    mmnRefbook->Enabled = mE[0];
+    mmnService->Enabled = mE[1];
+    mmnReport->Enabled = mE[2];
+    mmnAdmin->Enabled = mE[3];
+    mmnGoods->Enabled = mE[4];
+}
+//---------------------------------------------------------------------------
+void __fastcall TMainForm::mmnResCheckClick(TObject *Sender)
+{
+    bool Period = true;
+
+    if(AdminMode || UserGrants[12] != '0')
+    {
+        SQL_exefun(DBName,"select SettingsVal from Settings where SettingsKey='repBalansePeriod'",&retString);
+        Period = !(atoi(retString.c_str()) == 0);
+    }
+
+    TDateTime bdt;
+    TDateTime edt;
+
+    __int64 UID = 0;
+    AnsiString sUser = "все";
+    __int64 *pUserIDs = NULL;
+    AnsiString *pUsers = NULL;
+
+    if(Period)
+    {
+        DateIntervalForm = new TDateIntervalForm(this);
+
+        DTI_BegDate = Now();
+        DTI_EndDate = DTI_BegDate;
+        FormResult = 0;
+
+        DateIntervalForm->laUsers->Visible = true;
+        DateIntervalForm->lbUsers->Visible = true;
+
+        unsigned cnt = SQL_fldKeyCollect(DBName,"StarsUser","from Stars",&pUserIDs,&pUsers,false,true);
+
+        pUsers[0] = "все";
+        pUserIDs[0] = 0;
+
+        for(int i = 0; i < cnt; i++)
+            DateIntervalForm->lbUsers->Items->Add(pUsers[i]);
+
+        DateIntervalForm->lbUsers->ItemIndex = 0;
+
+        DateIntervalForm->ShowModal();
+
+        UID = pUserIDs[DateIntervalForm->lbUsers->ItemIndex];
+        sUser = pUsers[DateIntervalForm->lbUsers->ItemIndex];
+
+        delete DateIntervalForm;
+
+        if(FormResult != 1) return;
+        bdt = DTI_BegDate;
+        edt = DTI_EndDate + 1;
+    }
+    else
+    {
+         bdt = Now();
+         edt = bdt + 1;
+    }
+
+    unsigned Start = (int)bdt;
+    unsigned Finish = (int)edt;
+
+    AnsiString tail = "where b.ROWID is null and e.NAME<>'Фитнесс' and a.BEGDATE>=";
+    tail += Start;
+    tail += " and a.BEGDATE<";
+    tail += Finish;
+    tail += " group by F1,F5,F6,F2,F3,F7,F8";
+
+    AnsiString sql =
+"select "
+    "cast('30.12.1899' as timestamp)+a.BEGDATE as F1,"
+    "c.STARSUSER as F2,"
+    "cast('30.12.1899' as timestamp)+a.CDATE as F3,"
+    "list(h.STARSUSER,', ') as F4,"
+    "f.FULLNAME as F5,"
+    "'['||e.NAME||']'||d.NAME as F6, 'o' as F7,null as F8 "
+
+"FROM RESERVE a "
+
+"left join VISITS_SPA b on a.CLIENTID=b.CLIENTID and Trunc(a.BEGDATE)=Trunc(b.BEGTIME) and a.SERVICEID=b.SERVICEID "
+"left join STARS c on a.CUID=c.ROWID "
+"left join SERVICES d on a.SERVICEID=d.ROWID "
+"left join SERVICES e on d.PARENTID=e.ROWID "
+"left join CLIENTS f on a.CLIENTID=f.ROWID "
+
+"left join CALENDAR g on "
+"extract(year from cast('30.12.1899' as timestamp)+a.BEGDATE)=g.CALENDARYEAR "
+"and extract(month from cast('30.12.1899' as timestamp)+a.BEGDATE)=g.CALENDARMONTH "
+"and bin_and(bin_shl(1,extract(day from cast('30.12.1899' as timestamp)+a.BEGDATE)),g.DAYS)<>0 "
+"and g.PERSONID<0 "
+
+"left join STARS h on -g.PERSONID=h.ROWID ";
+
+
+
+    sql = sql + tail + " union all " + StringReplace(StringReplace(StringReplace(sql,"RESERVE","RESERVE_DEL",TReplaceFlags()),"'o'","'x'",TReplaceFlags()),"null as","i.STARSUSER||'|'||cast(a.EDATE as varchar(64)) as",TReplaceFlags()) +
+    "left join STARS i on a.EUID=i.ROWID " + tail + " order by 1,5";
+
+    SQL_exefun(NULL,("select count(*) from (" + sql + ")").c_str(),&retString);
+    unsigned cnt = atoi(retString.c_str());
+
+    pbProgress->Width = ClientWidth;
+    pbProgress->Height = ClientHeight;
+    pbProgress->Left = 0;
+    pbProgress->Top = 0;
+    pbProgress->Step = 1;
+    pbProgress->Min = 0;
+    pbProgress->Position = 0;
+
+    if(cnt)
+        pbProgress->Max = cnt - 1;
+    else
+        pbProgress->Max = 0;
+
+    pbProgress->Visible = true;
+
+    bool mV[5], mE[5];
+    mV[0] = mmnRefbook->Visible;
+    mV[1] = mmnService->Visible;
+    mV[2] = mmnReport->Visible;
+    mV[3] = mmnAdmin->Visible;
+    mV[4] = mmnGoods->Visible;
+
+    mE[0] = mmnRefbook->Enabled;
+    mE[1] = mmnService->Enabled;
+    mE[2] = mmnReport->Enabled;
+    mE[3] = mmnAdmin->Enabled;
+    mE[4] = mmnGoods->Enabled;
+
+    mmnRefbook->Enabled = false;
+    mmnService->Enabled = false;
+    mmnReport->Enabled = false;
+    mmnAdmin->Enabled = false;
+    mmnGoods->Enabled = false;
+
+    pResCheck = new ResCheck[cnt];
+
+    //if(Start == Finish - 1)
+    //    repShowDate = false;
+    //else
+    //    repShowDate = true;
+
+
+
+    // Формируем отчет
+    repResCheckForm = new TrepResCheckForm(this);
+
+
+    //if(repShowDate)
+    //{
+    //    repResCheckForm->QRLabel1->Caption = "Дата";
+    //    repResCheckForm->QRLabel10->Caption = "Фамилия";
+    //    repResCheckForm->QRLabel11->Caption = "Имя";
+    //}
+
+    represcheck_select();
+    SQL_exe(NULL,sql.c_str(),represcheck_select);
+
+    if(Period)
+        repResCheckForm->QRHeader->Caption = "Отчет \"Анализ Резервирования\" (" + sUser + ") с "+bdt.DateString()+" по "+(edt-1).DateString();
+    else
+        repResCheckForm->QRHeader->Caption = "Отчет \"Анализ Резервирования\" (" + sUser + ") на "+bdt.DateString();
+
+    repResCheckForm->QRCreated->Caption = repCreated(Start < (Finish - 1));
+
+    pbProgress->Visible = false;
+
+    repResCheckForm->QuickRep1->Preview();
+
+    PDEL(pUserIDs);
+    PDEL(pUsers);
+
+    PDEL(pResCheck);
+
+    delete repResCheckForm;
+
+    mmnRefbook->Visible = mV[0];
+    mmnService->Visible = mV[1];
+    mmnReport->Visible = mV[2];
+    mmnAdmin->Visible = mV[3];
+    mmnGoods->Visible = mV[4];
+
+    mmnRefbook->Enabled = mE[0];
+    mmnService->Enabled = mE[1];
+    mmnReport->Enabled = mE[2];
+    mmnAdmin->Enabled = mE[3];
+    mmnGoods->Enabled = mE[4];
+}
+//---------------------------------------------------------------------------
+void __fastcall TMainForm::tiResBathTimer(TObject *Sender)
+{
+    // Автоматическое списание записей
+    ReserveFlag = true;
+
+    TDateTime dtn = Now();
+    TDateTime dt = (double)dtn - (30.0 / 1440.0);
+
+    AnsiString *psIDs;
+
+    TIBTransaction *pTrans = new TIBTransaction(NULL);
+    pTrans->DefaultDatabase = dmMain->DBMain;
+    pTrans->Params->Clear();
+    pTrans->Params->Add("read_committed");
+    pTrans->Params->Add("rec_version");
+    pTrans->Params->Add("nowait");
+
+    //read_committed
+    //rec_version
+    //nowait
+
+
+    TIBQuery *pQue = new TIBQuery(NULL);
+    pQue->Database = dmMain->DBMain;
+    pQue->Transaction = pTrans;
+
+    TDataSource *pDS = new TDataSource(NULL);
+    pDS->DataSet = pQue;
+
+    pTrans->Active = true;
+
+    /*
+    AnsiString sql = "select RowID from FitGroup where Closed=0 and BegDate<" + AnsiString((double)dt);
+
+    pQue->SQL->Add(sql);
+    pQue->Prepare();
+    pQue->Open();
+
+    if(pQue->Eof)
+    {
+        pQue->Close();
+        pTrans->Active = false;
+        delete pDS;
+        delete pQue;
+        delete pTrans;
+
+        ReserveFlag = false;
+        return;
+    }
+
+    pQue->FetchAll();
+
+    unsigned cnt = pQue->RecordCount;
+    psIDs = new AnsiString[cnt];
+    for(unsigned i = 0; i < cnt; i++)
+    {
+        psIDs[i] = pQue->Fields->Fields[0]->AsString;
+        pQue->Next();
+    }
+
+    pQue->Close();
+    */
+
+    AnsiString sql = "select count(*) from RESERVE where SERVICEID=";
+    sql += BATH_VISIT;
+    sql += " and STATUS=1 and BEGDATE<=";
+    sql += (double)dt;
+    pQue->SQL->Clear();
+    pQue->SQL->Add(sql);
+    pQue->Prepare();
+    pQue->Open();
+    unsigned cnt = 0;
+    if(!pQue->Eof)
+        cnt = pQue->Fields->Fields[0]->AsInteger;
+    pQue->Close();
+
+    if(!cnt)
+    {
+        //delete [] psIDs;
+
+        pTrans->Rollback();
+        pTrans->Active = false;
+
+        delete pDS;
+        delete pQue;
+        delete pTrans;
+
+        ReserveFlag = false;
+
+        return;
+    }
+
+    sql = StringReplace(sql,"count(*)","ROWID,CLIENTID,BEGDATE",TReplaceFlags());
+
+    pQue->SQL->Clear();
+    pQue->SQL->Add(sql);
+    pQue->Prepare();
+    pQue->Open();
+    pQue->FetchAll();
+
+    AnsiString *pRIDs = new AnsiString[cnt];
+    AnsiString *pCIDs = new AnsiString[cnt];
+    AnsiString *pBDTs = new AnsiString[cnt];
+
+    for(unsigned i = 0; i < cnt; i++)
+    {
+        pRIDs[i] = pQue->Fields->Fields[0]->AsString;
+        pCIDs[i] = pQue->Fields->Fields[1]->AsString;
+        double d = pQue->Fields->Fields[2]->AsFloat;
+        pBDTs[i] = d - (int)d;
+        pQue->Next();
+    }
+
+    pQue->Close();
+    unsigned tcnt;
+    AnsiString pRow[6];
+
+    for(unsigned i = 0; i < cnt; i++)
+    {
+        // Есть доступное посещение?
+
+        pQue->SQL->Clear();
+        pQue->SQL->Add("select count(*) from Abonements_Bath where Closed=0 and FixSum>=0 and EndDate>="+AnsiString((int)Now())+" and ClientID="+pCIDs[i]);
+        pQue->Prepare();
+        pQue->Open();
+        tcnt = 0;
+        if(!pQue->Eof)
+            tcnt = pQue->Fields->Fields[0]->AsInteger;
+        pQue->Close();
+        if(!tcnt) continue;
+
+        //-----
+        // Поискать старый абонемент
+        pQue->SQL->Clear();
+        pQue->SQL->Add("select first 1 a.RowID,a.Price,a.AbonementsCount,a.FixSum,a.Name,b.AbType from Abonements_Bath a inner join AbTypes b on a.AbTypeID=b.RowID where a.Closed=0 and a.FixSum>=0 and a.ClientID="+pCIDs[i]+" order by a.BegDate,a.CDate");
+        pQue->Prepare();
+        pQue->Open();
+
+        if(pQue->Eof)
+        {
+            pQue->Close();
+            continue;
+        }
+
+        pRow[0] = pQue->Fields->Fields[0]->AsString;
+        pRow[1] = pQue->Fields->Fields[1]->AsString;
+        pRow[2] = pQue->Fields->Fields[2]->AsString;
+        pRow[3] = pQue->Fields->Fields[3]->AsString;
+        pRow[4] = pQue->Fields->Fields[4]->AsString;
+        pRow[5] = pQue->Fields->Fields[5]->AsString;
+
+        pQue->Close();
+
+        /*
+        int abtype = atoi(pRow[5].c_str());
+
+        if(abtype == BATH_VISIT_MWD || abtype == BATH_VISIT_WD)
+        {
+            // Выходной день
+            int day = dt.DayOfWeek();
+            if(day == 1 || day == 7)
+            {
+                Application->MessageBox("Внимание!\nДоступны посещения только в будние дни.","Недопустимая операция",ID_OK);
+                return;
+            }
+        }
+
+        if(abtype == BATH_VISIT_MWD || abtype == BATH_VISIT_MALL)
+        {
+            unsigned short h, m, s, ms;
+            // Утренний абонемент
+
+            dt.DecodeTime(&h, &m, &s, &ms);
+
+            if(h >= 17)
+            {
+                Application->MessageBox("Внимание!\nДоступны посещения только до 17:00.","Недопустимая операция",ID_OK);
+                return;
+            }
+        }
+        */
+
+
+        __int64 AbID = _atoi64(pRow[0].c_str());
+
+        double price = atof(pRow[1].c_str());
+        unsigned count = atoi(pRow[2].c_str());
+        double fixsum = atof(pRow[3].c_str());
+
+        __int64 VisitID;
+
+        sql = "insert into Visits_Bath(AbonementID,VisitsDate,BegTime,EndTime,Price,PersonID,ServiceID,CDate,CUID,EDate,EUID) values (";
+
+        sql += AbID;
+        sql += ",";
+
+        sql += (double)dtn;
+        sql += ",";
+
+        sql += pBDTs[i];
+        sql += ",";
+
+        sql += (double)(dtn - (int)dtn);
+        sql += ",";
+
+        if(fixsum > 0.0)
+            sql += fixsum;
+        else
+        {
+            if(count != 0.0)
+                sql += price/count;
+            // Может быть клубная карта
+            else if(pRow[4].Pos("Клубная карта") > 0)
+                sql += "0";
+            else continue;
+        }
+        sql += ",";
+
+        sql += "0,";
+
+        sql += BATH_VISIT;
+        sql += ",";
+
+        sql += (double)dtn;
+        sql += ",";
+
+        sql += UserID;
+        sql += ",";
+
+        sql += (double)dtn;
+        sql += ",";
+
+        sql += UserID;
+        sql += ")";
+
+        pQue->SQL->Clear();
+        pQue->SQL->Add(sql);
+        pQue->Prepare();
+        pQue->ExecSQL();
+        pQue->Close();
+
+        // Закрыть текущий RESERVE
+        pQue->SQL->Clear();
+        pQue->SQL->Add("update RESERVE set STATUS=3 where ROWID="+pRIDs[i]);
+        pQue->Prepare();
+        pQue->ExecSQL();
+        pQue->Close();
+    }
+    //---------------------
+    pTrans->Commit();
+    pTrans->Active = false;
+
+    PDEL(pRIDs);
+    PDEL(pCIDs);
+    PDEL(pBDTs);
+
+    delete pDS;
+    delete pQue;
+    delete pTrans;
+
+    ReserveFlag = false;
+
+    //-----
+    //PDEL(IDsAbonementsBath);
+    //sgAbonementsBathFullUpdate(ClientID);
 }
 //---------------------------------------------------------------------------
 

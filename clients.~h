@@ -242,6 +242,7 @@ __published:	// IDE-managed Components
     TMenuItem *pbSettings;
     TMenuItem *pbBills;
     TMenuItem *pbIncome;
+    TSpeedButton *sbBathVisit;
     void __fastcall tbAddClick(TObject *Sender);
     void __fastcall FormShow(TObject *Sender);
     void __fastcall sgClientsDrawCell(TObject *Sender, int ACol, int ARow,
@@ -297,9 +298,6 @@ __published:	// IDE-managed Components
     void __fastcall Panel10MouseDown(TObject *Sender, TMouseButton Button,
           TShiftState Shift, int X, int Y);
     void __fastcall lbFitServiceExit(TObject *Sender);
-    void __fastcall lbFitServiceDblClick(TObject *Sender);
-    void __fastcall lbFitServiceKeyDown(TObject *Sender, WORD &Key,
-          TShiftState Shift);
     void __fastcall sgNotesDrawCell(TObject *Sender, int ACol, int ARow,
           TRect &Rect, TGridDrawState State);
     void __fastcall meNoteExit(TObject *Sender);
@@ -394,9 +392,12 @@ __published:	// IDE-managed Components
     void __fastcall pbReportXClick(TObject *Sender);
     void __fastcall pbSettingsClick(TObject *Sender);
     void __fastcall pbOutcomeClick(TObject *Sender);
+    void __fastcall sgAbonementsBathDblClick(TObject *Sender);
+    void __fastcall sbBathVisitClick(TObject *Sender);
+    void __fastcall SpeedButton5Click(TObject *Sender);
 
 private:	// User declarations
-    bool BackFlag;
+
 
     double BathPrice;
     double BathHours;
@@ -498,7 +499,13 @@ private:	// User declarations
 
     bool __fastcall LoadKassa(__int64);
 
+    void __fastcall MirrorClubCard(__int64);
+
 public:		// User declarations
+    bool BackFlag;
+    __int64 *IDs;
+    unsigned Counter;
+
     __int64 *ReserveIDs;
     unsigned ReserveCounter;
 
@@ -523,7 +530,7 @@ public:		// User declarations
     //void __fastcall sgSellsRowInfo(__int64 *pID, unsigned cnt);
     //void __fastcall sgSellsFullUpdate(__int64);
     void __fastcall sgAbonementsFullUpdate(__int64,__int64 LastAbID=0);
-    //void __fastcall sgAbonementsBathFullUpdate(__int64);
+    void __fastcall sgAbonementsBathFullUpdate(__int64,__int64 LastAbID=0);
     void __fastcall AbsSPAFullCheck(void);
     void __fastcall sgAbonementsSPAFullUpdate(__int64,__int64 LastAbID=0);
     void __fastcall sgReserveFullUpdate(__int64 LastRecID=0);

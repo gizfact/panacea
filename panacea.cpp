@@ -49,6 +49,8 @@ USEFORM("repAdWorkDay.cpp", RepAdWorkDayForm);
 USEFORM("discard.cpp", DisCardForm);
 USEFORM("visitsbath.cpp", VisitsBathForm);
 USEFORM("kkm_outcome.cpp", KKMOutForm);
+USEFORM("resbath.cpp", ResBathForm);
+USEFORM("repResCheck.cpp", repResCheckForm);
 //---------------------------------------------------------------------------
 AnsiString _AppPath;
 AnsiString _AppName;

@@ -60,6 +60,7 @@ void __fastcall TLoginForm::btnOkClick(TObject *Sender)
     //matuM-ba!27 - "817de2478651c02b4d78b1a483558d96"
     {
         AdminMode = true;
+        UserAcc = "Администратор";
         Close();
         return;
     }

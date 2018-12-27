@@ -356,7 +356,12 @@ void __fastcall TAbTypesForm::sgAbTypesRowUpdate(__int64 *pID, unsigned cnt)
 //---------------------------------------------------------------------------
 void __fastcall TAbTypesForm::sgAbTypesFullUpdate(void)
 {
-    SQL_exefun(DBName,"select count(*) from AbTypes",&retString);
+    if(AbTypesFormMode == 1)
+        SQL_exefun(DBName,"select count(*) from AbTypes where Bath=0 or Name like 'Клубная%'",&retString);
+    else if(AbTypesFormMode == 2)
+        SQL_exefun(DBName,"select count(*) from AbTypes where Bath=1 and Name not like 'Клубная%'",&retString);
+    else
+        SQL_exefun(DBName,"select count(*) from AbTypes",&retString);
 
     __int64 SelRowID;
     bool SelFlag = false;
@@ -379,7 +384,12 @@ void __fastcall TAbTypesForm::sgAbTypesFullUpdate(void)
         IDs = new __int64[icnt];
         if(!IDs) Close();
 
-        SQL_exe(DBName,"select RowID,Alive,Name,Price,Days,AbTypesCount from AbTypes order by Name,EDate",abtypes_select);
+        if(AbTypesFormMode == 1)
+            SQL_exe(DBName,"select RowID,Alive,Name,Price,Days,AbTypesCount from AbTypes where Bath=0 or Name like 'Клубная%' order by Name,EDate",abtypes_select);
+        else if(AbTypesFormMode == 2)
+            SQL_exe(DBName,"select RowID,Alive,Name,Price,Days,AbTypesCount from AbTypes where Bath=1 and Name not like 'Клубная%' order by Name,EDate",abtypes_select);
+        else
+            SQL_exe(DBName,"select RowID,Alive,Name,Price,Days,AbTypesCount from AbTypes order by Name,EDate",abtypes_select);
 
         if(SelFlag)
         {
@@ -477,9 +487,10 @@ void __fastcall TAbTypesForm::sgAbTypesSelectCell(TObject *Sender,
 //---------------------------------------------------------------------------
 void __fastcall TAbTypesForm::sgAbTypesDblClick(TObject *Sender)
 {
-    if(AbTypesFormMode)
+    if(sgAbTypes->Row <= 0 || Counter <= 0 || !IDs) return;
+
+    if(AbTypesFormMode == 1)
     {
-        if(sgAbTypes->Row <= 0 || Counter <= 0 || !IDs) return;
         SQL_exefun(DBName,("select FixSum from AbTypes where RowID="+(AnsiString)IDs[sgAbTypes->Row-1]).c_str(),&retString);
         double fixsum = atof(retString.c_str());
 
@@ -512,6 +523,19 @@ void __fastcall TAbTypesForm::sgAbTypesDblClick(TObject *Sender)
             AbTypesFormRet2 = sgAbTypes->Cells[2][sgAbTypes->Row];
             FormResult = 1;
         }
+
+        Close();
+    }
+    else if(AbTypesFormMode == 2)
+    {
+        AbTypesFormRet3 = "0";
+        AbTypesFormRet4 = BATH_VISIT;
+
+        AbTypesFormRetID = IDs[sgAbTypes->Row-1];
+
+        AbTypesFormRet1 = sgAbTypes->Cells[1][sgAbTypes->Row];
+        AbTypesFormRet2 = sgAbTypes->Cells[2][sgAbTypes->Row];
+        FormResult = 1;
 
         Close();
     }

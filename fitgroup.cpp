@@ -14,6 +14,8 @@ extern int FormResult;
 extern __int64 ClientID;
 extern const char *DBName;
 
+extern __int64 UserID;
+
 TFitGroupForm *FitGroupForm;
 //---------------------------------------------------------------------------
 static int shedule_fill(void *NotUsed,int argc,char **argv,char **azColName)
@@ -175,8 +177,12 @@ void __fastcall TFitGroupForm::ToolButton2Click(TObject *Sender)
             return;
         //const char *pMsg = "TFitGroupForm::ToolButton2Click";
         SQL_BeginTransaction();
-        SQL_exe(DBName,("delete from Reserve where FitGroupID="+AnsiString(ID)).c_str());
-        SQL_exe(DBName,("delete from FitGroup where RowID="+AnsiString(ID)).c_str());
+
+        SQL_exe(NULL,("insert into Reserve_Del select Reserve.*,null,null from Reserve where RowID="+AnsiString(ID)+" or FitGroupID="+AnsiString(ID)).c_str());
+        SQL_exe(NULL,(AnsiString("update Reserve_Del set EDATE=")+(double)Now()+",EUID="+AnsiString(UserID)+" where EDATE is null and EUID is null").c_str());
+
+        SQL_exe(DBName,("delete from Reserve where RowID="+AnsiString(ID)+" or FitGroupID="+AnsiString(ID)).c_str());
+        //SQL_exe(DBName,("delete from FitGroup where RowID="+AnsiString(ID)).c_str());
         SQL_CommitTransaction();
 
         sgSheduleFullUpdate();

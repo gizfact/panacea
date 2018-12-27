@@ -19,7 +19,7 @@
 
 #include "kkm.h"
 
-#define DYN_LENGTH         20
+#define DYN_LENGTH      20
 
 
 //---------------------------------------------------------------------------
@@ -1843,7 +1843,7 @@ void __fastcall TKassaForm::Button5Click(TObject *Sender)
 void __fastcall TKassaForm::Button6Click(TObject *Sender)
 {
     // Абонемент Баня
-
+    // Добавить абонемент
     edInput->Visible = false;
 
     SQL_exefun(DBName,("select count(*) from BillItems where BillID="+AnsiString(KassaBillID)+" and AbTypeID="+AnsiString(SELLOP_ABONEMENT_BATH)).c_str(),&retString);
@@ -1851,30 +1851,18 @@ void __fastcall TKassaForm::Button6Click(TObject *Sender)
 
     if(abcnt > 0)
     {
-        Application->MessageBox("Внимание!\nМожно завести только один абонемент в Баню.","Недопустимая операция",MB_OK);
+        Application->MessageBox("Внимание!\nМожно завести только один абонемент на Баню.","Недопустимая операция",MB_OK);
         return;
     }
 
-    double price;
-    //__int64 PID;
-    //__int64 SID;
+    AbTypesFormMode = 2; // Банные
+    AbTypesForm = new TAbTypesForm(this);
+    AbTypesForm->ShowModal();
+    delete AbTypesForm;
 
-    AbParamForm = new TAbParamForm(this);
-    AbParamForm->Tag = "Bath";
-    //AbParamForm->edBalanse->Visible = true;
-    //AbParamForm->laBalanse->Visible = true;
-    AbParamForm->ShowModal();
+    AbTypesFormMode = 0;
 
-    if(FormResult == 1)
-    {
-        //PID = AbParamForm->AbParamPID;
-        //SID = AbParamForm->AbParamSID;
-        price = AbParamForm->Balanse;
-    }
-
-    delete AbParamForm;
-
-    if(FormResult != 1)
+    if(FormResult != 1 || !AbTypesFormRetID)
     {
         FormResult = 0;
         return;
@@ -1883,23 +1871,25 @@ void __fastcall TKassaForm::Button6Click(TObject *Sender)
     FormResult = 0;
 
     __int64 ID;
+
+    // AbTypesFormRet1 - Name
+    // AbTypesFormRet2 - Price
+    double price = ATOF(AbTypesFormRet2.c_str());
+
+    if(UserDiscount != 0)
+        price = (price * (100.0 - UserDiscount))/ 100.0;
+
     double total = price;
 
     SQL_iniInsert(DBName,"BillItems",&ID);
     SQL_addInsert("BillID",KassaBillID);
-
+    SQL_addInsert("AbTypeID",AbTypesFormRetID);
+    SQL_addInsert("PersonID",AbTypesFormRet3);
+    SQL_addInsert("ServiceID",AbTypesFormRet4);
     SQL_addInsert("Price",price);
+    //SQL_addInsert("FixSum",fixsum);
     SQL_addInsert("BillItemsCount",1);
-
-    double discount = 0.0;
-    //if(price >= 4000.0 && price < 5501.0)
-    //    discount = 7.0;
-    //else if(price >= 5501.0 && price < 7000)
-    //    discount = 10.0;
-    //else if(price >= 7000.0) discount = 13.0;
-
-    //SQL_addInsert("#Name","Скидка "+AnsiString(discount)+"%");
-    SQL_addInsert("Discount",discount);
+    SQL_addInsert("Discount",UserDiscount);
     SQL_addInsert("Total",total);
 
     SQL_exeInsert("Op",SELLOP_ABONEMENT_BATH);
@@ -1915,10 +1905,17 @@ void __fastcall TKassaForm::Button6Click(TObject *Sender)
     sgKassa->Row = sgKassa->RowCount - 1;
 
     sgKassa->Cells[0][sgKassa->Row] = "абонемент в Баню";
-    sgKassa->Cells[1][sgKassa->Row] = "Скидка "+AnsiString(discount)+"%";
+    sgKassa->Cells[1][sgKassa->Row] = AbTypesFormRet1;
     sgKassa->Cells[2][sgKassa->Row] = FormatFloat(MoneyFormat,price).TrimLeft();
     sgKassa->Cells[3][sgKassa->Row] = "1";
-    sgKassa->Cells[4][sgKassa->Row] = "";
+
+    double x;
+    if(modf(UserDiscount,&x) != 0.0)
+        sgKassa->Cells[4][sgKassa->Row] = FormatFloat(MoneyFormat,UserDiscount).TrimLeft()+"%";
+    else
+        sgKassa->Cells[4][sgKassa->Row] = (AnsiString)(int)UserDiscount+"%";
+
+    //sgKassa->Cells[4][sgKassa->Row] = FormatFloat(MoneyFormat,UserDiscount).TrimLeft();
     sgKassa->Cells[5][sgKassa->Row] = FormatFloat(MoneyFormat,total).TrimLeft();
 
     Total += total;
@@ -2723,41 +2720,74 @@ __int64 __fastcall TKassaForm::Billing(void)
         //-----------------------------------------------------------------------------------------------------
         if(KassaOps & SELLOP_ABONEMENT_BATH)
         {
-            SQL_exefun(DBName,("select count(*) from BillItems where BillID="+(AnsiString)ID+" and Op="+AnsiString(SELLOP_ABONEMENT_BATH)).c_str(),&retString);
+            SQL_exefun(DBName,("select count(*) from AbTypes where RowID in (select AbTypeID from BillItems where BillID="+(AnsiString)ID+" and AbTypeID!=0)").c_str(),&retString);
             cnt = atoi(retString.c_str());
 
             if(cnt == 1)
             {
-                // Есть Баня
                 AnsiString sBIID;
                 __int64 AID;
-                pAbFields = new AnsiString[4];
+                pAbFields = new AnsiString[9];
 
-                SQL_exefun3(DBName,("select Price,PersonID,RowID from BillItems where BillID="+(AnsiString)ID+" and Op="+AnsiString(SELLOP_ABONEMENT_BATH)).c_str(),&pAbFields[0],&pAbFields[1],&sBIID);
-                SQL_exefun2(DBName,("select ServiceID,Discount from BillItems where BillID="+(AnsiString)ID+" and Op="+AnsiString(SELLOP_ABONEMENT_BATH)).c_str(),&pAbFields[2],&pAbFields[3]);
-                double price = atof(pAbFields[0].c_str());
-                TDateTime edt = addmonths(dt,1);
+                retString = "select RowID,Name,Price,AbTypesCount,Days,AutoFlow,PersonID,ServiceID,FixSum from AbTypes where RowID in (select AbTypeID from BillItems where BillID=";
+                retString += ((AnsiString)ID + " and AbTypeID!=0)");
+                SQL_exe(DBName,retString.c_str(),abonements_create);
+
+                SQL_exefun3(DBName,("select PersonID,ServiceID,RowID from BillItems where BillID="+(AnsiString)ID+" and AbTypeID!=0").c_str(),&pAbFields[6],&pAbFields[7],&sBIID);
+
+                double fixsum = atof(pAbFields[8].c_str());
+                int count = atoi(pAbFields[3].c_str());
+                int autoflow = atoi(pAbFields[5].c_str());
+                if(autoflow) autoflow = 60;
+
+                double price = atof(pAbFields[2].c_str());
+                if(UserDiscount != 0.0)
+                {
+                    if(price != 0.0)
+                        price = (price * (100.0 - UserDiscount)) / 100.0;
+                    if(fixsum != 0.0)
+                        fixsum = (fixsum * (100.0 - UserDiscount)) / 100.0;
+                }
 
                 SQL_iniInsert(DBName,"Abonements_Bath",&AID);
 
+                SQL_addInsert("AbonementID",0);
                 SQL_addInsert("ClientID",ClientID);
-                SQL_addInsert("Balanse",price);
+                SQL_addInsert("AbTypeID",pAbFields[0]);
+                SQL_addInsert("PersonID",pAbFields[6]);
+                SQL_addInsert("ServiceID",pAbFields[7]);
+                SQL_addInsert("FixSum",fixsum);
+                SQL_addInsert("!Name",pAbFields[1]);
                 SQL_addInsert("Price",price);
-
-                //SQL_addInsert("PersonID",pAbFields[1]);
-                //SQL_addInsert("ServiceID",pAbFields[2]);
-                //SQL_addInsert("FixSum",fixsum);
-                SQL_addInsert("#Name","Скидка "+pAbFields[3]+"%");
-                //SQL_addInsert("Count",count);
-                SQL_addInsert("Discount",pAbFields[3]);
+                SQL_addInsert("AbonementsCount",count);
+                SQL_addInsert("Discount",UserDiscount);
                 SQL_addInsert("BegDate",(double)dt);
-                SQL_exeInsert("EndDate",(double)edt);
-                //SQL_addInsert("AutoFlow",autoflow);
-                //SQL_addInsert("CDate",(double)dt);
-                //SQL_addInsert("CUID",UserID);
-                //SQL_addInsert("EDate",(double)dt);
 
-                //SQL_exeInsert("EUID",UserID);
+                unsigned days = atoi(pAbFields[4].c_str());
+
+                TDateTime edt;
+
+                if(days == 1)
+                    edt = dt;
+                else
+                {
+                    if(days == 90)
+                        edt = addmonths(dt,3);
+                    else if(days == 180)
+                        edt = addmonths(dt,6);
+                    else if(days == 360)
+                        edt = addmonths(dt,12);
+                    else
+                        edt = addmonths(dt,1);
+                }
+
+                SQL_addInsert("EndDate",(double)edt);
+                SQL_addInsert("AutoFlow",autoflow);
+                SQL_addInsert("CDate",(double)dt);
+                SQL_addInsert("CUID",UserID);
+                SQL_addInsert("EDate",(double)dt);
+
+                SQL_exeInsert("EUID",UserID);
 
                 SQL_iniUpdate(NULL,"BillItems",_atoi64(sBIID.c_str()));
                 SQL_exeUpdate("AbonementID",AID);
@@ -2769,9 +2799,34 @@ __int64 __fastcall TKassaForm::Billing(void)
                     SQL_addInsert("F1",ID);
                     SQL_addInsert("F2",_atoi64(sBIID.c_str()));
                     SQL_addInsert("F3",AID);
-                    SQL_addInsert("F4",1);
+                    SQL_addInsert("F4",0);
                     SQL_addInsert("F5",UserID);
                     SQL_exeInsert("F6",(double)dt);
+                }
+
+                if(pAbFields[0] == BATH_TICKET)
+                {
+                    SQL_iniInsert(DBName,"Visits_Bath");
+                    SQL_addInsert("AbonementID",AID);
+
+                    SQL_addInsert("VisitsDate",(double)dt);
+                    SQL_addInsert("BegTime",(double)dt);
+                    SQL_addInsert("EndTime",(double)edt);
+
+                    SQL_addInsert("Price",price);
+
+                    SQL_addInsert("PersonID",pAbFields[6]);
+                    SQL_addInsert("ServiceID",pAbFields[7]);
+
+                    SQL_addInsert("CDate",(double)dt);
+                    SQL_addInsert("CUID",UserID);
+                    SQL_addInsert("EDate",(double)dt);
+
+                    SQL_exeInsert("EUID",UserID);
+
+                    //price -= fixsum;
+
+                    // Остатка не должно быть?
                 }
 
                 PDEL(pAbFields);

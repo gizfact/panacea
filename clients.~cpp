@@ -23,8 +23,12 @@
 #include "gservlist.h"
 #include "bills.h"
 #include "rescontrol.h"
+#include "resbath.h"
+
 
 #include "kkm.h"
+
+
 #include "kkm_outcome.h"
 
 #pragma package(smart_init)
@@ -51,8 +55,8 @@ double UserDiscount = 0.0;
 double UserDiscountSPA = 0.0;
 //double UserDiscountBath = 0.0;
 
-static __int64 *IDs = NULL;
-static unsigned Counter = 0;
+//static __int64 *IDs = NULL;
+//static unsigned Counter = 0;
 
 static __int64 *IDsAbonements = NULL;
 static unsigned CounterAbonements = 0;
@@ -536,26 +540,29 @@ static int fitshedule_fill(void *NotUsed,int argc,char **argv,char **azColName)
 
     ClientsForm->sgFitShedule->Rows[pos]->Objects[0] = (TObject *)ID;
 
-    SQL_exefun(DBName,("select BegDate from FitGroup where RowID="+AnsiString(ID)).c_str(),&sRet);
-    if(atof(sRet.c_str()) + (15.0 / 1440.0) < (double)Now())
+    //SQL_exefun(DBName,("select BegDate from FitGroup where RowID="+AnsiString(ID)).c_str(),&sRet);
+
+
+    if(ATOF(argv[3]) + (15.0 / 1440.0) < (double)Now())
     {
         ClientsForm->sgFitShedule->Cells[0][pos] = " ";
         //SQL_exefun(DBName,("select count(*) from Reserve where FitGroupID="+AnsiString(ID)).c_str(),&sRet);
     }
     else
     {
-        SQL_exefun(DBName,("select count(*) from Reserve where ClientID="+AnsiString(ClientID)+" and FitGroupID="+AnsiString(ID)).c_str(),&sRet);
-        ClientsForm->sgFitShedule->Cells[0][pos] = atoi(sRet.c_str())? " " : "";
+
+        //SQL_exefun(DBName,("select count(*) from Reserve where ClientID="+AnsiString(ClientID)+" and FitGroupID="+AnsiString(ID)).c_str(),&sRet);
+        ClientsForm->sgFitShedule->Cells[0][pos] = ATOI(argv[6])? " " : "";
     }
 
-    //ClientsForm->sgShedule->Cells[0][pos] = "";
+
     ClientsForm->sgFitShedule->Cells[1][pos] = argv[1];
     ClientsForm->sgFitShedule->Cells[2][pos] = argv[2];
     ClientsForm->sgFitShedule->Cells[3][pos] = TDateTime(atof(argv[3])).FormatString("hh:nn");
-    //ClientsForm->sgFitShedule->Cells[4][pos] = TDateTime(atof(argv[4])).FormatString("hh:nn");
+
     SQL_exefun(DBName,("select count(*) from Reserve where FitGroupID="+AnsiString(ID)).c_str(),&sRet);
-    ClientsForm->sgFitShedule->Cells[4][pos] = sRet;
-    ClientsForm->sgFitShedule->Cells[5][pos] = atoi(argv[5]);
+    ClientsForm->sgFitShedule->Cells[4][pos] = ATOI(sRet.c_str());
+    ClientsForm->sgFitShedule->Cells[5][pos] = ATOI(argv[5]);
 
     return 0;
 }
@@ -761,14 +768,16 @@ static int abonements_select(void *NotUsed, int argc, char **argv, char **azColN
     else
         visits = 0;
 
-    if(fixsum > 0.0 && !visits)
+
+    if(fixsum >= 0.0 && !visits)
     {
         ClientsForm->sgAbonements->Cells[4][CounterAbonements] = FormatFloat(MoneyFormat,price).TrimLeft();
         ClientsForm->sgAbonements->Cells[5][CounterAbonements] = atoi(retString.c_str());
 
         return 0;
     }
-    else if(fixsum < 0.0)
+
+    if(fixsum < 0.0)
     {
         ClientsForm->sgAbonements->Cells[4][CounterAbonements] = FormatFloat(MoneyFormat,price).TrimLeft();
         ClientsForm->sgAbonements->Cells[5][CounterAbonements] = "";
@@ -896,11 +905,8 @@ static int abonements_bath_select(void *NotUsed, int argc, char **argv, char **a
     else
         return 0;
 
-    // Closed - argv[1]
-    if(argv[1])
-        ClientsForm->sgAbonementsBath->Cells[0][CounterAbonementsBath] = (atoi(argv[1]))? " " : "";
-    else
-        ClientsForm->sgAbonementsBath->Cells[0][CounterAbonementsBath] = " ";
+    double fixsum = (argv[7])? atof(argv[7]) : 0.0;
+    //LastAbFixSum = fixsum;
 
     // Name - argv[2]
     ClientsForm->sgAbonementsBath->Cells[1][CounterAbonementsBath] = argv[2];
@@ -931,38 +937,77 @@ static int abonements_bath_select(void *NotUsed, int argc, char **argv, char **a
     else
         ClientsForm->sgAbonementsBath->Cells[3][CounterAbonementsBath] = "";
 
-    // Balanse - argv[5]
-    double balanse;
-    if(argv[5])
-        balanse = atof(argv[5]);
+    // Closed - argv[1]
+    if(argv[1])
+        ClientsForm->sgAbonementsBath->Cells[0][CounterAbonementsBath] = (atoi(argv[1]))? " " : "";
     else
-        balanse = 0.0;
+        ClientsForm->sgAbonementsBath->Cells[0][CounterAbonementsBath] = " ";
 
-    ClientsForm->sgAbonementsBath->Cells[4][CounterAbonementsBath] = FormatFloat(MoneyFormat,balanse).TrimLeft();
+    if(ClientsForm->sgAbonementsBath->Cells[0][CounterAbonementsBath].Length() == 0 && (int)dt < (int)Now())
+        ClientsForm->sgAbonementsBath->Cells[0][CounterAbonementsBath] = "\t";
+    // Price - argv[5]
 
-    AnsiString sCnt;
-    SQL_exefun(DBName,("select count(*) from Visits_Bath where AbonementID="+AnsiString(IDsAbonementsBath[CounterAbonementsBath-1])).c_str(),&sCnt);
-    ClientsForm->sgAbonementsBath->Cells[5][CounterAbonementsBath] = sCnt;
+    SQL_exefun(DBName,((AnsiString)"select count(*) from Visits_Bath where AbonementID=" + argv[0]).c_str(),&retString);
+    double price, amount;
+    if(argv[5])
+        price = atof(argv[5]);
+    else
+        price = 0.0;
+
+    // Visits - argv[6], FixSum - argv[7]
+    int visits;
+    if(argv[6])
+        visits = atoi(argv[6]);
+    else
+        visits = 0;
+
+
+    if(fixsum >= 0.0 && !visits)
+    {
+        ClientsForm->sgAbonementsBath->Cells[4][CounterAbonementsBath] = FormatFloat(MoneyFormat,price).TrimLeft();
+        ClientsForm->sgAbonementsBath->Cells[5][CounterAbonementsBath] = atoi(retString.c_str());
+
+        return 0;
+    }
+
+    if(fixsum < 0.0)
+    {
+        ClientsForm->sgAbonementsBath->Cells[4][CounterAbonementsBath] = FormatFloat(MoneyFormat,price).TrimLeft();
+        ClientsForm->sgAbonementsBath->Cells[5][CounterAbonementsBath] = "";
+
+        return 0;
+    }
+
+    int z = visits - atoi(retString.c_str());
+    if(z < 0) z = 0;
+
+    if(visits)
+        amount = (z * price) / visits;
+    else
+        amount = 0.0;
+
+    ClientsForm->sgAbonementsBath->Cells[4][CounterAbonementsBath] = FormatFloat(MoneyFormat,amount).TrimLeft() + " / " + FormatFloat(MoneyFormat,price).TrimLeft();
+    ClientsForm->sgAbonementsBath->Cells[5][CounterAbonementsBath] = (AnsiString)z + " / " + visits;
 
     return 0;
 }
 //---------------------------------------------------------------------------
 static int clients_select(void *NotUsed, int argc, char **argv, char **azColName)
 {
-    if(IDs)
-        IDs[Counter] = _atoi64(argv[0]);
+    if(ClientsForm->IDs)
+        ClientsForm->IDs[ClientsForm->Counter] = _atoi64(argv[0]);
     else
         return 0;
 
     if(argv[1])
-        ClientsForm->sgClients->Cells[0][++Counter] = (atoi(argv[1]))? "" : " ";
+        ClientsForm->sgClients->Cells[0][++ClientsForm->Counter] = (atoi(argv[1]))? "" : " ";
     else
-        ClientsForm->sgClients->Cells[0][++Counter] = "";
+        ClientsForm->sgClients->Cells[0][++ClientsForm->Counter] = "";
 
-    ClientsForm->sgClients->Cells[1][Counter] = argv[2];
-    ClientsForm->sgClients->Cells[2][Counter] = argv[3];
-    ClientsForm->sgClients->Cells[3][Counter] = argv[4];
-    ClientsForm->sgClients->Cells[4][Counter] = argv[5];
+    ClientsForm->sgClients->Cells[1][ClientsForm->Counter] = argv[2];
+    ClientsForm->sgClients->Cells[2][ClientsForm->Counter] = argv[3];
+    ClientsForm->sgClients->Cells[3][ClientsForm->Counter] = argv[4];
+    ClientsForm->sgClients->Cells[4][ClientsForm->Counter] = argv[5];
 
     return 0;
 }
@@ -1556,19 +1601,50 @@ void __fastcall TClientsForm::sgAbonementsSPAFullUpdate(__int64 ID,__int64 LastA
     SQL_CommitTransaction();
 }
 //---------------------------------------------------------------------------
-/*
-void __fastcall TClientsForm::sgAbonementsBathFullUpdate(__int64 ID)
+void __fastcall TClientsForm::sgAbonementsBathFullUpdate(__int64 ID,__int64 LastAbID)
 {
     if(SQL_BeginTransaction() != SQLITE_OK) return;
 
     __int64 *AbIDs;
-    AnsiString sEndDate, *pAbCounts;
+    AnsiString *pAbCounts;
+    AnsiString sFixSum, sEndDate;
 
-    unsigned cnt = SQL_fldKeyCollect(DBName,"Balanse",("from Abonements_Bath where Closed=0 and ClientID="+AnsiString(ClientID)+" order by BegDate").c_str(),&AbIDs,&pAbCounts);
+    // Отдельно не абонементы
+    unsigned cnt = SQL_fldKeyCollect(DBName,"EndDate",("from Abonements_Bath where Closed=0 and AbonementsCount<1 and ClientID="+AnsiString(ClientID)).c_str(),&AbIDs,&pAbCounts);
 
     for(unsigned i = 0; i < cnt; i++)
     {
-        if(atoi(pAbCounts[i].c_str()) <= 0)
+        if(atoi(pAbCounts[i].c_str()) < (int)Now())
+            SQL_exe(DBName,("update Abonements_Bath set Closed=1 where RowID="+AnsiString(AbIDs[i])).c_str());
+    }
+
+    delete [] AbIDs;
+    delete [] pAbCounts;
+
+    cnt = SQL_fldKeyCollect(DBName,"EndDate",("from Abonements_Bath where Closed=0 and AbonementsCount=1 and ClientID="+AnsiString(ClientID)).c_str(),&AbIDs,&pAbCounts);
+
+    for(unsigned i = 0; i < cnt; i++)
+    {
+        if(atoi(pAbCounts[i].c_str()) < (int)Now())
+            SQL_exe(DBName,("update Abonements_Bath set Closed=1 where RowID="+AnsiString(AbIDs[i])).c_str());
+        else
+        {
+            SQL_exefun(DBName,("select count(*) from Visits_Bath where AbonementID="+AnsiString(AbIDs[i])).c_str(),&retString);
+            if(atoi(retString.c_str()) >= 1)
+                SQL_exe(DBName,("update Abonements_Bath set Closed=1 where RowID="+AnsiString(AbIDs[i])).c_str());
+        }
+    }
+
+    delete [] AbIDs;
+    delete [] pAbCounts;
+
+    cnt = SQL_fldKeyCollect(DBName,"AbonementsCount",("from Abonements_Bath where Closed=0 and AbonementsCount>1 and ClientID="+AnsiString(ClientID)+" order by BegDate").c_str(),&AbIDs,&pAbCounts);
+
+    for(unsigned i = 0; i < cnt; i++)
+    {
+        SQL_exefun(DBName,("select count(*) from Visits_Bath where AbonementID="+AnsiString(AbIDs[i])).c_str(),&retString);
+
+        if(atoi(retString.c_str()) >= atoi(pAbCounts[i].c_str()))
         {
             // закрыть и дальше
             SQL_exe(DBName,("update Abonements_Bath set Closed=1 where RowID="+AnsiString(AbIDs[i])).c_str());
@@ -1592,7 +1668,7 @@ void __fastcall TClientsForm::sgAbonementsBathFullUpdate(__int64 ID)
 
         // Есть след. абонемент!
         SQL_exefun(DBName,("select EndDate from Abonements_Bath where RowID="+AnsiString(AbIDs[i])).c_str(),&sEndDate);
-        SQL_exefun(DBName,("select BegDate from Abonements_Bath where RowID="+AnsiString(AbIDs[i+1])).c_str(),&retString);
+        SQL_exefun(DBName,("select CDate from Abonements_Bath where RowID="+AnsiString(AbIDs[i+1])).c_str(),&retString);
         if((int)addmonths(atoi(sEndDate.c_str()),2) < atoi(retString.c_str()))
         {
             // закрыть
@@ -1606,8 +1682,12 @@ void __fastcall TClientsForm::sgAbonementsBathFullUpdate(__int64 ID)
     if(cbShowAbBathClosed->Checked)
         SQL_exefun(DBName,("select count(*) from Abonements_Bath where ClientID="+(AnsiString)ID).c_str(),&retString);
     else
-        SQL_exefun(DBName,("select count(*) from Abonements_Bath where Closed=0 and ClientID="+(AnsiString)ID).c_str(),&retString);
-
+    {
+        if(LastAbID)
+            SQL_exefun(DBName,("select count(*) from Abonements_Bath where (Closed=0 or RowID="+AnsiString(LastAbID)+") and ClientID="+(AnsiString)ID).c_str(),&retString);
+        else
+            SQL_exefun(DBName,("select count(*) from Abonements_Bath where Closed=0 and ClientID="+(AnsiString)ID).c_str(),&retString);
+    }
     __int64 SelRowID;
     bool SelFlag = false;
     if(IDsAbonementsBath)
@@ -1621,6 +1701,7 @@ void __fastcall TClientsForm::sgAbonementsBathFullUpdate(__int64 ID)
     sgAbonementsBath->RowCount = (!icnt)? 2 : icnt + 1;
     sgAbonementsBath->Rows[sgAbonementsBath->RowCount-1]->Clear();
     sgAbonementsBath->Cells[0][1] = "";
+    //sgClients->Row = 1;
 
     CounterAbonementsBath = 0;
 
@@ -1632,10 +1713,14 @@ void __fastcall TClientsForm::sgAbonementsBathFullUpdate(__int64 ID)
         //LastAbID = 0;
         //SQL_exe(DBName,("select Bills.RowID,CDate,sum(Total) from Bills inner join BillItems on Bills.RowID=BillID where ClientID="+(AnsiString)ID+" group by BillID order by CDate desc").c_str(),sells_select);
         if(cbShowAbBathClosed->Checked)
-            SQL_exe(DBName,("select RowID,Closed,Name,BegDate,EndDate,Balanse from Abonements_Bath where ClientID="+(AnsiString)ID+" order by BegDate desc,RowID desc").c_str(),abonements_bath_select);
+            SQL_exe(DBName,("select RowID,Closed,Name,BegDate,EndDate,Price,AbonementsCount,FixSum from Abonements_Bath where ClientID="+(AnsiString)ID+" order by BegDate desc,CDate desc").c_str(),abonements_bath_select);
         else
-            SQL_exe(DBName,("select RowID,Closed,Name,BegDate,EndDate,Balanse from Abonements_Bath where Closed=0 and ClientID="+(AnsiString)ID+" order by BegDate desc,RowID desc").c_str(),abonements_bath_select);
-
+        {
+            if(LastAbID)
+                SQL_exe(DBName,("select RowID,Closed,Name,BegDate,EndDate,Price,AbonementsCount,FixSum from Abonements_Bath where (Closed=0 or RowID="+AnsiString(LastAbID)+") and ClientID="+(AnsiString)ID+" order by BegDate desc,CDate desc").c_str(),abonements_bath_select);
+            else
+                SQL_exe(DBName,("select RowID,Closed,Name,BegDate,EndDate,Price,AbonementsCount,FixSum from Abonements_Bath where Closed=0 and ClientID="+(AnsiString)ID+" order by BegDate desc,CDate desc").c_str(),abonements_bath_select);
+        }
         if(SelFlag)
         {
             unsigned i;
@@ -1654,7 +1739,7 @@ void __fastcall TClientsForm::sgAbonementsBathFullUpdate(__int64 ID)
 
     SQL_CommitTransaction();
 
-}*/
+}
 //---------------------------------------------------------------------------
 void __fastcall TClientsForm::NotesUpdate(__int64 *IDs, unsigned pos)
 {
@@ -1837,8 +1922,22 @@ void __fastcall TClientsForm::sgClientsFullUpdate(void)
 //---------------------------------------------------------------------------
 void __fastcall TClientsForm::FormShow(TObject *Sender)
 {
-    //dtpResDate->DateTime = Now();
+    IDs = NULL;
+    Counter = 0;
+    // Скопировать клубные карты если есть
+    /*
+    char *sql =
 
+    "insert into ABONEMENTS_BATH(ABONEMENTID,CLIENTID,ABTYPEID,PERSONID,SERVICEID,NAME,PRICE,ABONEMENTSCOUNT,DISCOUNT,AUTOFLOW,BEGDATE,ENDDATE,CLOSED,CDATE,CUID,EDATE,EUID,FIXSUM,SYNC) "
+    "select a.ROWID,a.CLIENTID,a.ABTYPEID,a.PERSONID,a.SERVICEID,a.NAME,a.PRICE,a.ABONEMENTSCOUNT,a.DISCOUNT,a.AUTOFLOW,a.BEGDATE,a.ENDDATE,a.CLOSED,a.CDATE,a.CUID,a.EDATE,a.EUID,a.FIXSUM,a.SYNC "
+    "from ABONEMENTS a "
+    "inner join ABTYPES b on a.ABTYPEID=b.ROWID "
+    "left join ABONEMENTS_BATH c on a.ROWID=c.ABONEMENTID "
+
+    "where c.ROWID is null and b.BATH=1";
+
+    SQL_exe(NULL, sql);
+    */
     SQL_exefun(DBName,"select SettingsVal from Settings where SettingsKey='ClientsWidth'",&retString);
     int width = atoi(retString.c_str());
     if(width <= 0) width = 400;
@@ -2005,6 +2104,11 @@ void __fastcall TClientsForm::FormShow(TObject *Sender)
     edSearchStr->SetFocus();
 }
 //---------------------------------------------------------------------------
+void __fastcall TClientsForm::MirrorClubCard(__int64 CID)
+{
+    
+}
+//---------------------------------------------------------------------------
 void __fastcall TClientsForm::sgClientsRowInfo(__int64 *pID, unsigned cnt)
 {
     if(!paBathRes->Visible)
@@ -2016,7 +2120,22 @@ void __fastcall TClientsForm::sgClientsRowInfo(__int64 *pID, unsigned cnt)
     }
     
     if(pID)
+    {
         ClientID = pID[cnt];
+        // Скопировать клубные карты если есть
+
+        char *sql =
+
+        "insert into ABONEMENTS_BATH(ABONEMENTID,CLIENTID,ABTYPEID,PERSONID,SERVICEID,NAME,PRICE,ABONEMENTSCOUNT,DISCOUNT,AUTOFLOW,BEGDATE,ENDDATE,CLOSED,CDATE,CUID,EDATE,EUID,FIXSUM,SYNC) "
+        "select a.ROWID,a.CLIENTID,a.ABTYPEID,a.PERSONID,a.SERVICEID,a.NAME,a.PRICE,a.ABONEMENTSCOUNT,a.DISCOUNT,a.AUTOFLOW,a.BEGDATE,a.ENDDATE,a.CLOSED,a.CDATE,a.CUID,a.EDATE,a.EUID,a.FIXSUM,a.SYNC "
+        "from ABONEMENTS a "
+        "inner join ABTYPES b on a.ABTYPEID=b.ROWID "
+        "left join ABONEMENTS_BATH c on a.ROWID=c.ABONEMENTID "
+
+        "where c.ROWID is null and b.BATH=1 and a.CLIENTID=";
+
+        SQL_exe(NULL, (AnsiString(sql) + ClientID).c_str());
+    }
     else
         ClientID = 0;
 
@@ -2082,7 +2201,7 @@ void __fastcall TClientsForm::sgClientsRowInfo(__int64 *pID, unsigned cnt)
         //sgSellsFullUpdate(pID[cnt]);
         sgAbonementsFullUpdate(pID[cnt]);
         sgAbonementsSPAFullUpdate(pID[cnt]);
-        //sgAbonementsBathFullUpdate(pID[cnt]);
+        sgAbonementsBathFullUpdate(pID[cnt]);
 
         sgReserveFullUpdate();
     }
@@ -2591,6 +2710,7 @@ void __fastcall TClientsForm::cbShowAbClosedClick(TObject *Sender)
         sgAbonementsFullUpdate(ClientID);
 }
 //---------------------------------------------------------------------------
+/*
 void __fastcall TClientsForm::AbsFullCheck(void)
 {
 //(const char *dbname,const char *fName,const char *sql_from,AnsiString **pFld)
@@ -2616,7 +2736,7 @@ void __fastcall TClientsForm::AbsFullCheck(void)
     AbonementsUpdIDs.Length = 0;
 
     PDEL(pCIDs);
-}
+}*/
 //---------------------------------------------------------------------------
 void __fastcall TClientsForm::AbsSPAFullCheck(void)
 {
@@ -3306,9 +3426,10 @@ void __fastcall TClientsForm::lbFitServiceExit(TObject *Sender)
     lbFitService->Visible = false;
 }
 //---------------------------------------------------------------------------
+/*
 void __fastcall TClientsForm::lbFitServiceDblClick(TObject *Sender)
 {
-/*
+
     Panel10->BevelOuter = bvRaised;
     lbFitService->Visible = false;
 
@@ -3459,19 +3580,8 @@ void __fastcall TClientsForm::lbFitServiceDblClick(TObject *Sender)
             delete [] pV;
         }
     }
-*/
-}
-//---------------------------------------------------------------------------
-void __fastcall TClientsForm::lbFitServiceKeyDown(TObject *Sender,
-      WORD &Key, TShiftState Shift)
-{
-    if(Key == VK_RETURN)
-    {
-        lbFitServiceDblClick(Sender);
 
-        Key = 0;
-    }
-}
+}*/
 //---------------------------------------------------------------------------
 void __fastcall TClientsForm::sgNotesDrawCell(TObject *Sender, int ACol,
       int ARow, TRect &Rect, TGridDrawState State)
@@ -3551,6 +3661,11 @@ void __fastcall TClientsForm::SpeedButton4Click(TObject *Sender)
 
     SQL_BeginTransaction();
 
+    // Копия в RESERVE_DEL
+
+    SQL_exe(NULL,("insert into Reserve_Del select Reserve.*,null,null from Reserve where RowID="+retString+" or ParentID="+retString).c_str());
+    SQL_exe(NULL,(AnsiString("update Reserve_Del set EDATE=")+(double)Now()+",EUID="+AnsiString(UserID)+" where EDATE is null and EUID is null").c_str());
+
     SQL_exe(NULL,("delete from Reserve where RowID="+retString+" or ParentID="+retString).c_str());
     //SQL_exe(NULL,("delete from Reserve where RowID="+AnsiString(ReserveIDs[sgReserve->Row-1])).c_str());
 
@@ -3583,6 +3698,7 @@ void __fastcall TClientsForm::sbResClick(TObject *Sender)
 
 
     // Фитнесс или СПА?
+    // А может быть и Баня...
 
     SQL_exefun(DBName,("select Tag from Reserve,Services where ServiceID=Services.RowID and Reserve.RowID="+AnsiString(RID)).c_str(),&retString);
     //retString = (retString);
@@ -4014,6 +4130,133 @@ void __fastcall TClientsForm::sbResClick(TObject *Sender)
         {
             PDEL(IDsAbonements);
             sgAbonementsFullUpdate(ClientID,AbID);
+            sgReserveFullUpdate(RID);
+            sgFitSheduleFullUpdate();
+        }
+    }
+    else if(Tag.Pos("~Баня~") > 0)
+    {
+        // Есть доступное посещение?
+
+        AnsiString sFixSum, sCounter;
+
+        SQL_exefun(DBName,("select count(*) from Abonements_Bath where Closed=0 and FixSum>=0 and ClientID="+AnsiString(ClientID)).c_str(),&sCounter);
+        unsigned abs_cnt = atoi(sCounter.c_str());
+
+        if(!abs_cnt)
+        {
+            Application->MessageBox("Внимание!\nНет абонементов с доступными посещениями.","Недопустимая операция",ID_OK);
+            return;
+        }
+
+        SQL_exefun(DBName,("select first 1 FixSum from Abonements_Bath where Closed=0 and FixSum>=0 and ClientID="+AnsiString(ClientID)+" order by BegDate,CDate").c_str(),&sFixSum);
+
+        if(atof(sFixSum.c_str()) == 0.0)
+        {
+            // Требуется проверка на любой действующий абонемент
+            SQL_exefun(DBName,("select count(*) from Abonements_Bath where Closed=0 and FixSum>=0 and EndDate>="+AnsiString((int)Now())+" and ClientID="+AnsiString(ClientID)).c_str(),&sCounter);
+            abs_cnt = atoi(sCounter.c_str());
+
+            if(!abs_cnt)
+            {
+
+                Application->MessageBox("Внимание!\nТекущий абонемент просрочен. Для его продления нужно приобрести следующий абонемент.","Недопустимая операция",ID_OK);
+                return;
+            }
+        }
+
+        //-----------------------------------------------------
+        AnsiString pRowRes[4];
+        SQL_exefunrow(DBName,("select BegDate,EndDate,ServiceID,PersonID from Reserve where RowID="+AnsiString(RID)).c_str(),4,pRowRes);
+
+
+        // Поискать старый абонемент
+        if(SQL_BeginTransaction() != SQLITE_OK) return;
+
+        AnsiString pRow[4];
+        SQL_exefunrow(DBName,("select first 1 RowID,Price,AbonementsCount,FixSum from Abonements_Bath where Closed=0 and FixSum>=0 and ClientID="+(AnsiString)ClientID+" order by BegDate,CDate").c_str(),4,pRow);
+
+        __int64 AbID = _atoi64(pRow[0].c_str());
+
+        double price = atof(pRow[1].c_str());
+        unsigned count = atoi(pRow[2].c_str());
+        double fixsum = atof(pRow[3].c_str());
+
+        SQL_iniInsert(DBName,"Visits_Bath");
+        SQL_addInsert("AbonementID",AbID);
+
+        TDateTime bd = atof(pRowRes[0].c_str());
+        TDateTime ed = atof(pRowRes[1].c_str());
+        double x;
+
+        SQL_addInsert("VisitsDate",(int)bd);
+        SQL_addInsert("BegTime",modf(bd,&x));
+
+        SQL_addInsert("EndTime",modf(ed,&x));
+
+        if(fixsum > 0.0)
+            SQL_addInsert("Price",fixsum);
+        else
+        {
+            if(count != 0.0)
+                SQL_addInsert("Price",price/count);
+            else
+            {
+                SQL_CancelTransaction();
+                Application->MessageBox("Внимание!\nКол-во посещений равно 0.","Ошибка БД",MB_OK);
+
+                return;
+            }
+        }
+
+        SQL_addInsert("PersonID",pRowRes[3]);
+        SQL_addInsert("ServiceID",pRowRes[2]);
+        dt = Now();
+        SQL_addInsert("CDate",(double)dt);
+        SQL_addInsert("CUID",UserID);
+        SQL_addInsert("EDate",(double)dt);
+
+        SQL_exeInsert("EUID",UserID);
+
+        price -= fixsum;
+
+        if(count == 1 && fixsum != 0.0 && price > 0.0)
+        {
+            // Запишем остаток на бассейн
+            SQL_exefun(DBName,"select RowID from Services where Name='Бассейн'",&retString);
+            __int64 ID = _atoi64(retString.c_str());
+            if(!ID)
+            {
+                SQL_CancelTransaction();
+                Application->MessageBox("Внимание!\nНе найдена услуга Бассейн.","Ошибка БД",MB_OK);
+                //FormResult = 1;
+
+                return;
+            }
+
+            SQL_iniInsert(DBName,"Visits");
+            SQL_addInsert("AbonementID",AbID);
+
+            SQL_addInsert("VisitsDate",(int)bd);
+            SQL_addInsert("BegTime",modf(bd,&x));
+            SQL_addInsert("EndTime",modf(ed,&x));
+            SQL_addInsert("Price",price);
+            SQL_addInsert("PersonID",0);
+            SQL_addInsert("ServiceID",ID);
+
+            SQL_addInsert("CDate",(double)dt);
+            SQL_addInsert("CUID",UserID);
+            SQL_addInsert("EDate",(double)dt);
+            SQL_exeInsert("EUID",UserID);
+        }
+
+        SQL_iniUpdate(DBName,"Reserve",ReserveIDs[sgReserve->Row-1]);
+        SQL_exeUpdate("Status",2);
+
+        if(SQL_CommitTransaction() == SQLITE_OK)
+        {
+            PDEL(IDsAbonementsBath);
+            sgAbonementsBathFullUpdate(ClientID,AbID);
             sgReserveFullUpdate(RID);
             sgFitSheduleFullUpdate();
         }
@@ -4608,8 +4851,26 @@ void __fastcall TClientsForm::sgFitSheduleFullUpdate(bool fTop)
     if(day < 0) day = 6;
     day = 1 << day;
 
-    AnsiString sql = "select FitGroup.RowID,Services.Name,Personal.Name,BegDate,EndDate,FitGroupCount from FitGroup,Services,Personal where bin_and(WeekDays,"+AnsiString(day)+")!=0 and "
-    "FitGroup.ServiceID=Services.RowID and FitGroup.PersonID=Personal.RowID and trunc(BegDate,0)="+AnsiString((int)FitCurrentDay+FitCurButton)+" order by BegDate,Services.Name";
+    //AnsiString sql = "select FitGroup.RowID,Services.Name,Personal.Name,BegDate,EndDate,FitGroupCount from FitGroup,Services,Personal where bin_and(WeekDays,"+AnsiString(day)+")!=0 and "
+    //"FitGroup.ServiceID=Services.RowID and FitGroup.PersonID=Personal.RowID and trunc(BegDate,0)="+AnsiString((int)FitCurrentDay+FitCurButton)+" order by BegDate,Services.Name";
+
+    AnsiString sql =
+
+    "select a.ROWID,b.NAME,c.NAME,a.BEGDATE,a.ENDDATE,a.FITGROUPCOUNT,count(d.ROWID) "
+    "from FITGROUP a "
+    "left join SERVICES b on a.SERVICEID=b.ROWID "
+    "left join PERSONAL c on a.PERSONID=c.ROWID "
+    "left join RESERVE d on a.ROWID=d.FITGROUPID and d.CLIENTID=";
+
+    sql += ClientID;
+
+    sql += " where trunc(a.BEGDATE)=";
+    sql += (int)FitCurrentDay + FitCurButton;
+    sql += " and bin_and(b.WEEKDAYS,2)!=0 "
+
+    "group by 1,2,3,4,5,6 "
+
+    "order by a.BEGDATE,b.NAME";
 
     SQL_BeginTransaction();
     SQL_exe(DBName,sql.c_str(),fitshedule_fill);
@@ -6390,6 +6651,9 @@ void __fastcall TClientsForm::sbDelResClick(TObject *Sender)
 
     SQL_BeginTransaction();
 
+    SQL_exe(NULL,("insert into Reserve_Del select Reserve.*,null,null from Reserve where RowID="+retString+" or ParentID="+retString).c_str());
+    SQL_exe(NULL,(AnsiString("update Reserve_Del set EDATE=")+(double)Now()+",EUID="+AnsiString(UserID)+" where EDATE is null and EUID is null").c_str());
+
     SQL_exe(NULL,("delete from Reserve where RowID="+retString+" or ParentID="+retString).c_str());
 
     SQL_CommitTransaction();
@@ -6534,8 +6798,8 @@ void __fastcall TClientsForm::sgAbonementsBathDrawCell(TObject *Sender,
 //---------------------------------------------------------------------------
 void __fastcall TClientsForm::cbShowAbBathClosedClick(TObject *Sender)
 {
-   //if(ClientID)
-   //     sgAbonementsBathFullUpdate(ClientID);
+    if(ClientID)
+        sgAbonementsBathFullUpdate(ClientID);
 }
 //---------------------------------------------------------------------------
 void __fastcall TClientsForm::spbClosingBathClick(TObject *Sender)
@@ -6545,8 +6809,7 @@ void __fastcall TClientsForm::spbClosingBathClick(TObject *Sender)
         if(!IDs) return;
 
         ClientID = IDs[sgClients->Row-1];
-        //AbonementID = 0;
-        //AbonementSPAID = 0;
+
         AbonementBathID = 0;
 
         VisitsBathForm = new TVisitsBathForm(this);
@@ -7163,7 +7426,8 @@ void __fastcall TClientsForm::CheckKKMButtons(void)
 //---------------------------------------------------------------------------
 void __fastcall TClientsForm::pbSettingsClick(TObject *Sender)
 {
-    kkm_properties();
+
+    kkm_properties(Handle);
 }
 //---------------------------------------------------------------------------
 void __fastcall TClientsForm::pbOutcomeClick(TObject *Sender)
@@ -7312,6 +7576,154 @@ bool __fastcall TClientsForm::LoadKassa(__int64 BillID)
     BillsID = 0;
 
     return FormResult == -1;
+}
+//---------------------------------------------------------------------------
+void __fastcall TClientsForm::sgAbonementsBathDblClick(TObject *Sender)
+{
+    if(sgClients->Row > 0 && Counter > 0 && sgAbonementsBath->Row > 0 && CounterAbonementsBath > 0)
+    {
+        if(!IDs || !IDsAbonementsBath) return;
+
+        ClientID = IDs[sgClients->Row-1];
+        //AbonementSPAID = 0;
+        AbonementBathID = IDsAbonementsBath[sgAbonementsBath->Row-1];
+
+        SQL_exefun(DBName,("select CDate from Abonements_Bath where RowID="+AnsiString(AbonementBathID)).c_str(),&retString);
+        TDateTime dt = atof(retString.c_str());
+        retString = dt;
+
+        VisitsBathForm = new TVisitsBathForm(this);
+        VisitsBathForm->ShowModal();
+
+        if(VisitsBathForm->AbsModified)
+            sgAbonementsBathFullUpdate(ClientID);
+
+        delete VisitsBathForm;
+    }
+}
+//---------------------------------------------------------------------------
+void __fastcall TClientsForm::sbBathVisitClick(TObject *Sender)
+{
+    // Есть доступное посещение?
+    if(!ClientID) return;
+
+    AnsiString sRet, sCounter;
+
+    SQL_exefun(DBName,("select count(*) from Abonements_Bath where Closed=0 and FixSum>=0 and EndDate>="+AnsiString((int)Now())+" and ClientID="+AnsiString(ClientID)).c_str(),&sCounter);
+    unsigned abs_cnt = atoi(sCounter.c_str());
+
+    if(!abs_cnt)
+    {
+        Application->MessageBox("Внимание!\nНет абонементов с доступными посещениями.","Недопустимая операция",ID_OK);
+        return;
+    }
+
+    TDateTime dt = Now();
+
+
+
+    //-----
+    // Поискать старый абонемент
+    if(SQL_BeginTransaction() != SQLITE_OK) return;
+
+    AnsiString pRow[6];
+    SQL_exefunrow(DBName,("select first 1 a.RowID,a.Price,a.AbonementsCount,a.FixSum,a.Name,b.AbType from Abonements_Bath a inner join AbTypes b on a.AbTypeID=b.RowID where a.Closed=0 and a.FixSum>=0 and a.ClientID="+(AnsiString)ClientID+" order by a.BegDate,a.CDate").c_str(),6,pRow);
+
+    //int abtype = atoi(pRow[5].c_str());
+
+    /*
+    if(abtype == BATH_VISIT_MWD || abtype == BATH_VISIT_WD)
+    {
+        // Выходной день
+        int day = dt.DayOfWeek();
+        if(day == 1 || day == 7)
+        {
+            Application->MessageBox("Внимание!\nДоступны посещения только в будние дни.","Недопустимая операция",ID_OK);
+            return;
+        }
+    }
+
+    if(abtype == BATH_VISIT_MWD || abtype == BATH_VISIT_MALL)
+    {
+        unsigned short h, m, s, ms;
+        // Утренний абонемент
+
+        dt.DecodeTime(&h, &m, &s, &ms);
+
+        if(h >= 17)
+        {
+            Application->MessageBox("Внимание!\nДоступны посещения только до 17:00.","Недопустимая операция",ID_OK);
+            return;
+        }
+    }
+    */
+
+
+    __int64 AbID = _atoi64(pRow[0].c_str());
+
+    double price = atof(pRow[1].c_str());
+    unsigned count = atoi(pRow[2].c_str());
+    double fixsum = atof(pRow[3].c_str());
+
+    __int64 VisitID;
+
+
+    SQL_iniInsert(DBName,"Visits_Bath",&VisitID);
+    SQL_addInsert("AbonementID",AbID);
+
+    SQL_addInsert("VisitsDate",(double)dt);
+    SQL_addInsert("BegTime",(double)(dt - (int)dt));
+    SQL_addInsert("EndTime",(double)(dt - (int)dt));
+
+    if(fixsum > 0.0)
+        SQL_addInsert("Price",fixsum);
+    else
+    {
+        if(count != 0.0)
+            SQL_addInsert("Price",price/count);
+        // Может быть клубная карта
+        else if(pRow[4].Pos("Клубная карта") > 0)
+            SQL_addInsert("Price",0);
+        else
+        {
+            SQL_CancelTransaction();
+            Application->MessageBox("Внимание!\nКол-во занятий равно 0.","Ошибка БД",MB_OK);
+            Close();
+            return;
+        }
+    }
+
+
+    SQL_addInsert("PersonID",0);
+
+    SQL_addInsert("ServiceID",BATH_VISIT);
+
+    SQL_addInsert("CDate",(double)dt);
+    SQL_addInsert("CUID",UserID);
+    SQL_addInsert("EDate",(double)dt);
+
+    SQL_exeInsert("EUID",UserID);
+
+    //price -= fixsum;
+
+    //if(count == 1 && fixsum != 0.0 && price > 0.0)
+    //{
+       
+    //}
+
+    SQL_CommitTransaction();
+    //-----
+    PDEL(IDsAbonementsBath);
+    sgAbonementsBathFullUpdate(ClientID);
+}
+//---------------------------------------------------------------------------
+void __fastcall TClientsForm::SpeedButton5Click(TObject *Sender)
+{
+    ResBathForm = new TResBathForm(this);
+
+    ResBathForm->ShowModal();
+
+    delete ResBathForm;
 }
 //---------------------------------------------------------------------------
 

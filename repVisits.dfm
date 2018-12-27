@@ -382,7 +382,7 @@ object repVisitsForm: TrepVisitsForm
         42.3333333333333
         1899.70833333333)
       ParentBand = QRBand3
-      object QRLabel1: TQRLabel
+      object QRlaServ: TQRLabel
         Left = 0
         Top = 0
         Width = 240

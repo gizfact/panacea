@@ -122,6 +122,19 @@ object iAbTypesForm: TiAbTypesForm
     Font.Style = [fsBold]
     ParentFont = False
   end
+  object Label7: TLabel
+    Left = 152
+    Top = 251
+    Width = 30
+    Height = 16
+    Caption = #1058#1080#1087':'
+    Font.Charset = RUSSIAN_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -13
+    Font.Name = 'Verdana'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
   object cbAlive: TCheckBox
     Left = 8
     Top = 46
@@ -259,20 +272,20 @@ object iAbTypesForm: TiAbTypesForm
   end
   object GroupBox1: TGroupBox
     Left = 0
-    Top = 248
+    Top = 288
     Width = 357
-    Height = 133
+    Height = 93
     Align = alBottom
     Caption = #1055#1077#1088#1077#1093#1086#1076' '#1079#1072#1085#1103#1090#1080#1081
     TabOrder = 9
     DesignSize = (
       357
-      133)
+      93)
     object cbAutoFlow: TCheckBox
       Left = 8
-      Top = 20
+      Top = 23
       Width = 177
-      Height = 21
+      Height = 26
       Anchors = [akLeft, akTop, akBottom]
       Caption = #1048#1089#1087#1086#1083#1100#1079#1086#1074#1072#1090#1100
       Checked = True
@@ -300,6 +313,38 @@ object iAbTypesForm: TiAbTypesForm
     TabOrder = 10
     Text = '0.00'
     OnKeyPress = edFixSumKeyPress
+  end
+  object cbBath: TCheckBox
+    Left = 8
+    Top = 247
+    Width = 89
+    Height = 26
+    Anchors = [akLeft, akTop, akBottom]
+    Caption = #1041#1072#1085#1103
+    Font.Charset = RUSSIAN_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -13
+    Font.Name = 'Verdana'
+    Font.Style = [fsBold]
+    ParentFont = False
+    TabOrder = 11
+    OnClick = cbBathClick
+  end
+  object cbAbType: TComboBox
+    Left = 188
+    Top = 248
+    Width = 161
+    Height = 24
+    ItemHeight = 16
+    TabOrder = 12
+    Text = #1053#1077#1090
+    Items.Strings = (
+      #1050#1083#1091#1073#1085#1072#1103' '#1050#1072#1088#1090#1072
+      #1059#1090#1088#1086' ('#1073#1077#1079' '#1074#1099#1093'.)'
+      #1059#1090#1088#1086' ('#1074#1089#1103' '#1085#1077#1076#1077#1083#1103')'
+      #1042#1077#1089#1100' '#1076#1077#1085#1100' ('#1073#1077#1079' '#1074#1099#1093'.)'
+      #1042#1077#1089#1100' '#1076#1077#1085#1100
+      #1056#1072#1079#1086#1074#1086#1077' '#1087#1086#1089#1077#1097#1077#1085#1080#1077)
   end
   object iliAbTypes: TImageList
     Height = 32

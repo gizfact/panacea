@@ -151,7 +151,11 @@ void __fastcall TVisitsBathForm::sgVisitsFullUpdate(void)
 {
     SQL_BeginTransaction();
 
-    SQL_exefun(DBName,("select count(*) from Visits_Bath where AbonementID="+(AnsiString)AbonementBathID).c_str(),&retString);
+    if(AbonementBathID)
+        SQL_exefun(DBName,("select count(*) from Visits_Bath where AbonementID="+(AnsiString)AbonementBathID).c_str(),&retString);
+    else
+        SQL_exefun(DBName,("select count(*) from Visits_Bath a inner join Abonements_Bath b on a.AbonementID=b.RowID where b.ClientID="+(AnsiString)ClientID).c_str(),&retString);
+
 
     __int64 SelRowID = (Counter)? IDs[sgVisits->Row-1] : 0;
 
@@ -166,7 +170,10 @@ void __fastcall TVisitsBathForm::sgVisitsFullUpdate(void)
         if(IDs.Length < icnt)
             IDs.Length = icnt + 10;
 
-        SQL_exe(DBName,("select Visits_BathDate,BegTime,EndTime,ServiceID,PersonID,Price,RowID from Visits_Bath where AbonementID="+AnsiString(AbonementBathID)+" order by Visits_BathDate desc,RowID desc").c_str(),visits_select);
+        if(AbonementBathID)
+            SQL_exe(DBName,("select VisitsDate,BegTime,EndTime,ServiceID,PersonID,Price,RowID from Visits_Bath where AbonementID="+AnsiString(AbonementBathID)+" order by VisitsDate desc,RowID desc").c_str(),visits_select);
+        else
+            SQL_exe(DBName,("select a.VisitsDate,a.BegTime,a.EndTime,a.ServiceID,a.PersonID,a.Price,a.RowID from Visits_Bath a inner join Abonements_Bath b on a.AbonementID=b.RowID where b.ClientID="+AnsiString(ClientID)+" order by VisitsDate desc,RowID desc").c_str(),visits_select);
 
         if(SelRowID)
         {
@@ -251,6 +258,36 @@ void __fastcall TVisitsBathForm::FormKeyDown(TObject *Sender, WORD &Key,
 {
     if(Key == VK_ESCAPE)
         Close();
+}
+//---------------------------------------------------------------------------
+void __fastcall TVisitsBathForm::tbDelClick(TObject *Sender)
+{
+    if(!Counter) return;
+    __int64 VID = IDs[sgVisits->Row-1];
+
+    if(!VID) return;
+
+    if(AbonementBathID)
+    {
+        // Аннулирование услуги (с закрытого?)
+        SQL_BeginTransaction();
+
+        SQL_iniUpdate(NULL,"Abonements_Bath",AbonementBathID);
+        SQL_exeUpdate("Closed",0);
+
+        SQL_exe(NULL,("delete from Visits_Bath where RowID="+AnsiString(VID)).c_str());
+
+        SQL_CommitTransaction();
+
+
+        sgVisitsFullUpdate();
+
+        AbsModified = true;
+
+        return;
+    }
+
+    sgVisitsFullUpdate();
 }
 //---------------------------------------------------------------------------
 

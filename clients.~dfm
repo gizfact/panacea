@@ -1,8 +1,8 @@
 object ClientsForm: TClientsForm
-  Left = 74
-  Top = 1
+  Left = 104
+  Top = 15
   Width = 1382
-  Height = 784
+  Height = 825
   Caption = #1050#1083#1080#1077#1085#1090#1099
   Color = clBtnFace
   Font.Charset = RUSSIAN_CHARSET
@@ -58,7 +58,7 @@ object ClientsForm: TClientsForm
   TextHeight = 16
   object sbClients: TStatusBar
     Left = 0
-    Top = 727
+    Top = 768
     Width = 1366
     Height = 19
     Panels = <>
@@ -529,7 +529,7 @@ object ClientsForm: TClientsForm
     Left = 0
     Top = 98
     Width = 1366
-    Height = 629
+    Height = 670
     Align = alClient
     BevelOuter = bvNone
     BorderStyle = bsSingle
@@ -538,7 +538,7 @@ object ClientsForm: TClientsForm
       Left = 500
       Top = 0
       Width = 3
-      Height = 625
+      Height = 666
       Cursor = crHSplit
       Beveled = True
     end
@@ -546,7 +546,7 @@ object ClientsForm: TClientsForm
       Left = 503
       Top = 0
       Width = 859
-      Height = 625
+      Height = 666
       Align = alClient
       BevelOuter = bvNone
       TabOrder = 0
@@ -1067,9 +1067,7 @@ object ClientsForm: TClientsForm
           ParentFont = False
           TabOrder = 2
           Visible = False
-          OnDblClick = lbFitServiceDblClick
           OnExit = lbFitServiceExit
-          OnKeyDown = lbFitServiceKeyDown
         end
         object sgAbonements: TStringGrid
           Left = 1
@@ -1101,7 +1099,7 @@ object ClientsForm: TClientsForm
         Left = 0
         Top = 448
         Width = 859
-        Height = 177
+        Height = 218
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 2
@@ -1118,7 +1116,7 @@ object ClientsForm: TClientsForm
           Left = 0
           Top = 101
           Width = 859
-          Height = 76
+          Height = 117
           ActivePage = TabSheet4
           Align = alClient
           Font.Charset = RUSSIAN_CHARSET
@@ -1141,7 +1139,7 @@ object ClientsForm: TClientsForm
               Left = 505
               Top = 26
               Width = 3
-              Height = 19
+              Height = 60
               Cursor = crHSplit
               Beveled = True
             end
@@ -1280,7 +1278,7 @@ object ClientsForm: TClientsForm
               Left = 0
               Top = 26
               Width = 505
-              Height = 19
+              Height = 60
               Align = alLeft
               ColCount = 6
               DefaultRowHeight = 18
@@ -1297,7 +1295,7 @@ object ClientsForm: TClientsForm
               Left = 508
               Top = 26
               Width = 343
-              Height = 19
+              Height = 60
               Align = alClient
               ColCount = 4
               DefaultRowHeight = 18
@@ -1318,7 +1316,7 @@ object ClientsForm: TClientsForm
               Left = 305
               Top = 26
               Width = 3
-              Height = 19
+              Height = 60
               Cursor = crHSplit
             end
             object Panel15: TPanel
@@ -1456,7 +1454,7 @@ object ClientsForm: TClientsForm
               Left = 308
               Top = 26
               Width = 543
-              Height = 19
+              Height = 60
               Align = alClient
               DefaultRowHeight = 18
               FixedCols = 0
@@ -1478,7 +1476,7 @@ object ClientsForm: TClientsForm
               Left = 0
               Top = 26
               Width = 305
-              Height = 19
+              Height = 60
               Align = alLeft
               BevelOuter = bvNone
               TabOrder = 2
@@ -1486,7 +1484,7 @@ object ClientsForm: TClientsForm
                 Left = 0
                 Top = 24
                 Width = 305
-                Height = 62
+                Height = 36
                 Align = alClient
                 HideSelection = False
                 Indent = 19
@@ -1512,7 +1510,7 @@ object ClientsForm: TClientsForm
                   Height = 24
                   Style = csDropDownList
                   Anchors = [akLeft, akTop, akRight, akBottom]
-                  ItemHeight = 0
+                  ItemHeight = 16
                   TabOrder = 0
                   OnSelect = cbMGPersonSelect
                 end
@@ -1527,14 +1525,14 @@ object ClientsForm: TClientsForm
               Left = 305
               Top = 26
               Width = 3
-              Height = 19
+              Height = 60
               Cursor = crHSplit
             end
             object Panel21: TPanel
               Left = 0
               Top = 26
               Width = 305
-              Height = 19
+              Height = 60
               Align = alLeft
               BevelOuter = bvNone
               TabOrder = 0
@@ -1542,7 +1540,7 @@ object ClientsForm: TClientsForm
                 Left = 0
                 Top = 24
                 Width = 305
-                Height = 62
+                Height = 36
                 Align = alClient
                 HideSelection = False
                 Indent = 19
@@ -1567,7 +1565,7 @@ object ClientsForm: TClientsForm
                   Height = 24
                   Style = csDropDownList
                   Anchors = [akLeft, akTop, akRight, akBottom]
-                  ItemHeight = 0
+                  ItemHeight = 16
                   TabOrder = 0
                   OnSelect = cbSKPersonSelect
                 end
@@ -1577,7 +1575,7 @@ object ClientsForm: TClientsForm
               Left = 308
               Top = 26
               Width = 543
-              Height = 19
+              Height = 60
               Align = alClient
               DefaultRowHeight = 18
               FixedCols = 0
@@ -1735,7 +1733,7 @@ object ClientsForm: TClientsForm
               Left = 280
               Top = 26
               Width = 2
-              Height = 19
+              Height = 60
               Cursor = crHSplit
               Beveled = True
               OnMoved = Splitter9Moved
@@ -1940,7 +1938,7 @@ object ClientsForm: TClientsForm
               Left = 0
               Top = 26
               Width = 280
-              Height = 19
+              Height = 60
               Align = alLeft
               BevelOuter = bvNone
               TabOrder = 1
@@ -1948,7 +1946,7 @@ object ClientsForm: TClientsForm
                 Left = 0
                 Top = 24
                 Width = 280
-                Height = 62
+                Height = 36
                 Align = alClient
                 HideSelection = False
                 Indent = 19
@@ -1974,7 +1972,7 @@ object ClientsForm: TClientsForm
                   Height = 24
                   Style = csDropDownList
                   Anchors = [akLeft, akTop, akRight, akBottom]
-                  ItemHeight = 0
+                  ItemHeight = 16
                   TabOrder = 0
                   OnSelect = cbBathPersonSelect
                 end
@@ -1984,7 +1982,7 @@ object ClientsForm: TClientsForm
               Left = 282
               Top = 26
               Width = 569
-              Height = 19
+              Height = 60
               Align = alClient
               DefaultRowHeight = 18
               FixedCols = 0
@@ -2006,7 +2004,7 @@ object ClientsForm: TClientsForm
               Left = 282
               Top = 26
               Width = 569
-              Height = 19
+              Height = 60
               Align = alClient
               TabOrder = 3
               Visible = False
@@ -2189,7 +2187,7 @@ object ClientsForm: TClientsForm
             OnClick = sbDelResClick
           end
           object cbClosedReserve: TCheckBox
-            Left = 472
+            Left = 460
             Top = 5
             Width = 97
             Height = 17
@@ -2246,7 +2244,6 @@ object ClientsForm: TClientsForm
           Align = alClient
           ColCount = 6
           DefaultRowHeight = 18
-          Enabled = False
           FixedCols = 0
           RowCount = 2
           Font.Charset = RUSSIAN_CHARSET
@@ -2258,7 +2255,7 @@ object ClientsForm: TClientsForm
           ParentFont = False
           ScrollBars = ssVertical
           TabOrder = 0
-          OnDblClick = sgAbonementsSPADblClick
+          OnDblClick = sgAbonementsBathDblClick
           OnDrawCell = sgAbonementsBathDrawCell
         end
         object Panel26: TPanel
@@ -2270,12 +2267,11 @@ object ClientsForm: TClientsForm
           BevelOuter = bvNone
           TabOrder = 1
           object SpeedButton5: TSpeedButton
-            Left = 231
+            Left = 90
             Top = 2
-            Width = 113
+            Width = 121
             Height = 24
-            Caption = #1040#1085#1085#1091#1083#1080#1088#1086#1074#1072#1090#1100
-            Enabled = False
+            Caption = #1047#1072#1087#1080#1089#1100
             Font.Charset = RUSSIAN_CHARSET
             Font.Color = clFuchsia
             Font.Height = -13
@@ -2283,7 +2279,7 @@ object ClientsForm: TClientsForm
             Font.Style = [fsBold]
             ParentFont = False
             Spacing = 0
-            Visible = False
+            OnClick = SpeedButton5Click
           end
           object spbClosingBath: TSpeedButton
             Left = 8
@@ -2291,7 +2287,6 @@ object ClientsForm: TClientsForm
             Width = 38
             Height = 22
             Caption = #1041#1072#1085#1103
-            Enabled = False
             Flat = True
             Font.Charset = RUSSIAN_CHARSET
             Font.Color = clRed
@@ -2302,6 +2297,22 @@ object ClientsForm: TClientsForm
             ParentFont = False
             OnClick = spbClosingBathClick
           end
+          object sbBathVisit: TSpeedButton
+            Left = 315
+            Top = 2
+            Width = 121
+            Height = 24
+            Caption = #1057#1087#1080#1089#1072#1090#1100
+            Font.Charset = RUSSIAN_CHARSET
+            Font.Color = clFuchsia
+            Font.Height = -13
+            Font.Name = 'Verdana'
+            Font.Style = [fsBold]
+            ParentFont = False
+            Spacing = 0
+            Visible = False
+            OnClick = sbBathVisitClick
+          end
           object cbShowAbBathClosed: TCheckBox
             Left = 460
             Top = 5
@@ -2309,7 +2320,6 @@ object ClientsForm: TClientsForm
             Height = 17
             TabStop = False
             Caption = #1047#1072#1082#1088#1099#1090#1099#1077
-            Enabled = False
             TabOrder = 0
             OnClick = cbShowAbBathClosedClick
           end
@@ -2448,7 +2458,7 @@ object ClientsForm: TClientsForm
       Left = 0
       Top = 0
       Width = 500
-      Height = 625
+      Height = 666
       Align = alLeft
       TabOrder = 1
       object Splitter5: TSplitter
@@ -2485,7 +2495,7 @@ object ClientsForm: TClientsForm
         Left = 1
         Top = 533
         Width = 498
-        Height = 91
+        Height = 132
         TabStop = False
         Align = alClient
         BorderStyle = bsNone

@@ -198,16 +198,8 @@ void __fastcall TiClientsForm::tbSaveClick(TObject *Sender)
 
         SQL_addUpdate("#Info",mInfo->Lines->Text);
 
-        //if(edCard->Text.Length() > 0)
-        //{
-
-        //    fSync = true;
-        //}
-        //SQL_addUpdate("#Note",mNote->Lines->Text);
-        //SQL_addUpdate("CDate",tim);
         SQL_addUpdate("EDate",(double)dt);
         SQL_exeUpdate("EUID",UserID);
-        //ClientID = ID;
 
         FormResult = -1;
     }
@@ -222,107 +214,76 @@ void __fastcall TiClientsForm::tbSaveClick(TObject *Sender)
 //---------------------------------------------------------------------------
 static int iclients_select(void *NotUsed,int argc,char **argv,char **azColName)
 {
-    //if(argc >= 12)
-    //{
-        CID = (argv[0]);
-        iClientsForm->edCID->Text = CID;
-        iClientsForm->edFName->Text = (argv[1]);
-        iClientsForm->edSName->Text = (argv[2]);
-        iClientsForm->edTName->Text = (argv[3]);
+    CID = (argv[0]);
+    iClientsForm->edCID->Text = CID;
+    iClientsForm->edFName->Text = (argv[1]);
+    iClientsForm->edSName->Text = (argv[2]);
+    iClientsForm->edTName->Text = (argv[3]);
 
-        iClientsForm->FName = iClientsForm->edFName->Text;
-        iClientsForm->SName = iClientsForm->edSName->Text;
-        iClientsForm->TName = iClientsForm->edTName->Text;
+    iClientsForm->FName = iClientsForm->edFName->Text;
+    iClientsForm->SName = iClientsForm->edSName->Text;
+    iClientsForm->TName = iClientsForm->edTName->Text;
 
-        if(argv[4])
+    if(argv[4])
+        iClientsForm->dtpBirthDate->DateTime = atof(argv[4]);
+    else
+        iClientsForm->dtpBirthDate->Date = TDate(1900,1,1);
+
+    iClientsForm->edPhone1->Text = (argv[5])? argv[5] : "";
+    iClientsForm->edPhone2->Text = (argv[6])? argv[6] : "";
+    iClientsForm->mInfo->Lines->Text = (argv[8]);
+
+    if(argv[9])
+        iClientsForm->edBalanse->Text = FormatFloat(MoneyFormat,strtof(argv[9])).TrimLeft();
+    else
+        iClientsForm->edBalanse->Text = "0.00";
+
+    iClientsForm->cbAlive->Checked = (argv[10])? (atoi(argv[10]) != 0) : false;
+
+    if(argv[11] > 0)
+        PhotoPath = argv[11];
+    else
+        PhotoPath = "";
+    try
+    {
+        if(PhotoPath.Length() > 0)
         {
-            iClientsForm->dtpBirthDate->DateTime = atof(argv[4]);
-            //iClientsForm->dtpBirthDate->Time = TDateTime(0,0,0,0);
+            iClientsForm->Panel2->Caption = "";
+            iClientsForm->imPhoto->Picture->LoadFromFile(ImgPath + PhotoPath);
         }
-        else
-        {
-            iClientsForm->dtpBirthDate->Date = TDate(1900,1,1);
-            //iClientsForm->dtpBirthDate->Time = TTime(0,0,0,0);
-        }
+    }
+    catch(...)
+    {
+        iClientsForm->Panel2->Caption = "ÍÅÒ ÔÎÒÎ";
+    }
 
-        iClientsForm->edPhone1->Text = (argv[5])? argv[5] : "";
-        iClientsForm->edPhone2->Text = (argv[6])? argv[6] : "";
-        //iClientsForm->edPhone3->Text = (argv[7])? argv[7] : "";
-        iClientsForm->mInfo->Lines->Text = (argv[8]);
-        //iClientsForm->mNote->Lines->Text = (argv[14]);
+    NewPhotoPath = PhotoPath;
 
-        if(argv[9])
-            iClientsForm->edBalanse->Text = FormatFloat(MoneyFormat,strtof(argv[9])).TrimLeft();
-        else
-            iClientsForm->edBalanse->Text = "0.00";
+    iClientsForm->edCard->Text = (argv[12])? argv[12] : "";
+    iClientsForm->edCardNum->Text = (argv[15])? argv[15] : "";
+    iClientsForm->CardDate = (argv[16])? atof(argv[16]) : 0.0;
 
-        iClientsForm->cbAlive->Checked = (argv[10])? (atoi(argv[10]) != 0) : false;
+    iClientsForm->edWebPass->Text = (argv[14])? argv[14] : "";
 
-        if(argv[11] > 0)
-            PhotoPath = argv[11];
-        else
-            PhotoPath = "";
-        try
-        {
-            if(PhotoPath.Length() > 0)
-            {
-                iClientsForm->Panel2->Caption = "";
-                iClientsForm->imPhoto->Picture->LoadFromFile(ImgPath + PhotoPath);
-            }
-         }
-        catch(...)
-        {
-            iClientsForm->Panel2->Caption = "ÍÅÒ ÔÎÒÎ";
-        }
-    //}
-        NewPhotoPath = PhotoPath;
-
-
-        // Ñêèäêè
-        //double disc_f = (argv[12])? atof(argv[12]) : 0.0;
-        //double disc_s = (argv[13])? atof(argv[13]) : 0.0;
-
-        //if(disc_f > 0.0)
-        //{
-        //    if(disc_s > 0.0)
-        //    {
-        //        if(disc_f == 10.0)
-        //            iClientsForm->lbDiscount->ItemIndex = 5;
-        //        else
-        //            iClientsForm->lbDiscount->ItemIndex = 6;
-        //    }
-        //    else if(disc_f == 10.0)
-        //        iClientsForm->lbDiscount->ItemIndex = 1;
-        //    else
-        //        iClientsForm->lbDiscount->ItemIndex = 2;
-        //}
-        //else if(disc_s > 0.0)
-        //{
-        //    if(disc_s == 10.0)
-        //        iClientsForm->lbDiscount->ItemIndex = 3;
-        //    else
-        //        iClientsForm->lbDiscount->ItemIndex = 4;
-        //}
-        //else
-        //    iClientsForm->lbDiscount->ItemIndex = 0;
-        iClientsForm->edCard->Text = (argv[12])? argv[12] : "";
-        iClientsForm->edCardNum->Text = (argv[15])? argv[15] : "";
-        iClientsForm->CardDate = (argv[16])? atof(argv[16]) : 0.0;
-
-
-        iClientsForm->edWebPass->Text = (argv[14])? argv[14] : "";
-
-        double x, discount = (argv[13])? atof(argv[13]) : 0.0;
-        if(modf(discount,&x) != 0.0)
-            iClientsForm->edDiscount->Text = (AnsiString)discount;
-        else
-            iClientsForm->edDiscount->Text = (AnsiString)(int)discount;
+    double x, discount = (argv[13])? atof(argv[13]) : 0.0;
+    if(modf(discount,&x) != 0.0)
+        iClientsForm->edDiscount->Text = (AnsiString)discount;
+    else
+        iClientsForm->edDiscount->Text = (AnsiString)(int)discount;
 
     return 0;
 }
 //---------------------------------------------------------------------------
 void __fastcall TiClientsForm::FormShow(TObject *Sender)
 {
+    if(UserID == 0)
+    {
+        edCardNum->ReadOnly = false;
+        edCardNum->PasswordChar = 0;
+        edCard->ReadOnly = false;
+        edCard->PasswordChar = 0;
+    }
+
     if(UserID == 0 || UserGrants[12] != '0')
     {
         edDiscount->Enabled = true;

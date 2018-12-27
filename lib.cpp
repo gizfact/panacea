@@ -257,7 +257,6 @@ void __fastcall sgDrawCell(TObject *Sender,
     }
     else
     {
-
         pGrid->Canvas->Font->Style = fType;
 
         if(State.Contains(gdSelected))
@@ -269,6 +268,7 @@ void __fastcall sgDrawCell(TObject *Sender,
         {
 
             pGrid->Canvas->Brush->Color = clWhite;
+            //pGrid->Canvas->Brush->Color = clYellow;
             pGrid->Canvas->FillRect(Rect);
         }
 
@@ -395,7 +395,6 @@ case 'r':
             x = Rect.Right - pGrid->Canvas->TextWidth(pGrid->Cells[ACol][ARow]);
                 //int Y = Rect.Top + ((Rect.Bottom - Rect.Top - sgAbTypes->Canvas->TextHeight(sgAbTypes->Cells[ACol][ARow])) >> 1);
                 //Rect.Right -= 2;
-
             pGrid->Canvas->TextRect(Rect,x-2,Rect.top+1,pGrid->Cells[ACol][ARow]);
             break;
 

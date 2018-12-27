@@ -27,7 +27,7 @@ __published:	// IDE-managed Components
     TQRBand *QRBand3;
     TQRLabel *QRHeader;
     TQRChildBand *QRChildBand1;
-    TQRLabel *QRLabel1;
+    TQRLabel *QRlaServ;
     TQRLabel *QRLabel2;
     TQRLabel *QRLabel3;
     TQRLabel *QRLabel4;

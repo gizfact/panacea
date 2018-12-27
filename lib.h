@@ -34,6 +34,17 @@ extern TColor SelColor;
 #define BATH_ID 196
 #define BATH_COMPLEXID 373
 
+#define BATH_TICKET  52
+#define BATH_VISIT  659
+#define BATH_VISIT_CLUB 0
+#define BATH_VISIT_MWD 1
+#define BATH_VISIT_MALL 2
+#define BATH_VISIT_WD 3
+#define BATH_VISIT_ALL 4
+#define BATH_VISIT_ONE 5
+
+#define BATH_REDLINE    17.0/24.0
+
 // Имя
 // Цена
 // Кол-во
@@ -85,6 +96,7 @@ int __fastcall sgGetLastWidth(TStringGrid *);
 void __fastcall sgClearRow(TStringGrid *pGrid,int ARow=1);
 
 void __fastcall sgAlignTextDraw(TStringGrid *,int,int,TRect &,const char *alignment=NULL);
+//void __fastcall lvAlignTextDraw(TListView *,int,int,TRect &,const char *alignment=NULL);
 
 //unsigned __fastcall _SQL_arrSelect(const char *dbname,const __int64 *pIDs,unsigned cnt,char *sql_before,char *sql_after,AnsiString *pFlds,unsigned cnt_flds,char *mask=NULL);
 

@@ -605,7 +605,6 @@ void __fastcall TPersonalForm::sgPersonalSelectCell(TObject *Sender,
     sgPersonalRowInfo(IDs,ARow-1);
 }
 //---------------------------------------------------------------------------
-
 void __fastcall TPersonalForm::tbEditClick(TObject *Sender)
 {
     sgPersonalEdit();
