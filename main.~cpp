@@ -432,8 +432,6 @@ __fastcall TMainForm::TMainForm(TComponent* Owner)
 //---------------------------------------------------------------------------
 void __fastcall TMainForm::FormShow(TObject *Sender)
 {
-    //int res;
-
     if(kkm_init() != 0)
     {
         KKM_LINK = 0;
@@ -590,14 +588,11 @@ void __fastcall TMainForm::FormShow(TObject *Sender)
 
     if(!SyncFlag) return;
 
-
     tiSync->Interval = SyncPeriod * 60000;
     pSync = new TSync(true);
     tiSync->Enabled = true;
 
     //bool x = dmMain->SendMail("it@aptekar76.ru","Привет!","Это проверка почты");
-
-    //x = 0;
 }
 //---------------------------------------------------------------------------
 void __fastcall TMainForm::mmnUserlistClick(TObject *Sender)

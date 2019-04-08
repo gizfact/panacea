@@ -137,7 +137,7 @@ object repVisitsSPAForm: TrepVisitsSPAForm
         Alignment = taRightJustify
         AlignToBand = False
         AutoSize = False
-        AutoStretch = False
+        AutoStretch = True
         Font.Charset = RUSSIAN_CHARSET
         Font.Color = clWindowText
         Font.Height = -11

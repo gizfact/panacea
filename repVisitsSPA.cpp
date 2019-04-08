@@ -149,11 +149,26 @@ case 'L':
             VisitsPSum += atof(s.c_str());
 
             VisitsCnt++;
+       
+
 
             // Timed?
-            pos = s.Pos("-");
+            pos = Value.Pos(":");
             if(pos > 0)
-                VisitsTime += atoi(s.SubString(pos+1,s.Length()-pos).c_str());
+            {
+                unsigned char h2 = Value[pos-1] - '0';
+                unsigned char h1 = Value[pos-2] - '0';
+
+                VisitsTime += (h2 * 60);
+                if(h1 < 10) VisitsTime += (h1 * 600);
+
+                h1 = Value[pos+1] - '0';
+                h2 = Value[pos+2] - '0';
+
+                VisitsTime += ((h1 * 10) + h2);
+
+                //VisitsTime += atoi(s.SubString(pos+1,s.Length()-pos).c_str());
+            }
         }
         break;
 case 'I':
@@ -167,7 +182,16 @@ case 'I':
         {
             Value = FormatFloat(MoneyFormat,VisitsSum) + "/" + FormatFloat(MoneyFormat,VisitsPSum) + " (" + (AnsiString)VisitsCnt + ")";
             if(VisitsTime)
-                Value += AnsiString(" - ") + VisitsTime;
+            {
+                unsigned h = VisitsTime / 60;
+                unsigned m = VisitsTime % 60;
+                Value += AnsiString(" - ");
+                Value += h;
+                Value += ":";
+                if(m < 10)
+                    Value += '0';
+                Value += m;
+            }
         }
         else
             Value = "";
@@ -188,7 +212,17 @@ void __fastcall TrepVisitsSPAForm::QRVisitSumPrint(TObject *sender,
 {
     Value = FormatFloat(MoneyFormat,VisitsSumTotal) + "/" + FormatFloat(MoneyFormat,VisitsPSumTotal) + " (" + VisitsCntTotal + ")";
     if(VisitsTimeTotal)
-        Value += AnsiString(" - ") + VisitsTimeTotal;
+    {
+        //Value += AnsiString(" - ") + VisitsTimeTotal;
+        unsigned h = VisitsTimeTotal / 60;
+        unsigned m = VisitsTimeTotal % 60;
+        Value += AnsiString(" - ");
+        Value += h;
+        Value += ":";
+        if(m < 10)
+            Value += '0';
+        Value += m;
+    }
 }
 //---------------------------------------------------------------------------
 void __fastcall TrepVisitsSPAForm::QRAbSumPrint(TObject *sender,

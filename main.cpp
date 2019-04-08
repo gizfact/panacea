@@ -2971,16 +2971,16 @@ void __fastcall TMainForm::N21Click(TObject *Sender)
                 double price = atof(sRow[3].c_str()) - atof(retString.c_str());
                 double pprice = atof(sRow[4].c_str());
 
-                /*
+
                 SQL_exefun(DBName,("select Timed from Services where RowID="+AnsiString(_atoi64(sRow[0].c_str()))).c_str(),&retString);
 
                 if(atoi(retString.c_str()) > 0)
                 {
                     dt.DecodeTime(&h,&m,&s,&ms);
-                    pLines[2] = "(" + sRow[5] + "-" + dt.FormatString("h:nn") + ") ";
-
+                    //pLines[2] = "(" + sRow[5] + "-" + dt.FormatString("h:nn") + ") ";
+                    pLines[2] = "(" + dt.FormatString("h:nn") + ") ";
                 }
-                */
+
 
                 pLines[2] += (FormatFloat(MoneyFormat,pprice) + " / " + FormatFloat(MoneyFormat,price-pprice));
 

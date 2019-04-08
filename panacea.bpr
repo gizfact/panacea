@@ -56,7 +56,7 @@
     <DEBUGLIBPATH value="$(BCB)\lib\debug"/>
     <RELEASELIBPATH value="$(BCB)\lib\release"/>
     <LINKER value="ilink32"/>
-    <USERDEFINES value="_DEBUG"/>
+    <USERDEFINES value=""/>
     <SYSDEFINES value="NO_STRICT"/>
     <MAINSOURCE value="panacea.cpp"/>
     <INCLUDEPATH value="D:\panacea;&quot;C:\Program Files (x86)\Borland\CBuilder6\Projects&quot;;D:\Borland\CBuilder6\Projects;&quot;C:\Program Files\Borland\CBuilder6\Projects&quot;;&quot;C:\Documents and Settings\zax\Рабочий стол\panacea&quot;;$(BCB)\include;$(BCB)\include\vcl"/>
@@ -69,13 +69,13 @@
       -ID:\Borland\CBuilder6\Projects 
       -I&quot;C:\Program Files\Borland\CBuilder6\Projects&quot; 
       -I&quot;C:\Documents and Settings\zax\Рабочий стол\panacea&quot; -I$(BCB)\include 
-      -I$(BCB)\include\vcl -src_suffix cpp -D_DEBUG -boa"/>
-    <CFLAG1 value="-Od -H=$(BCB)\lib\vcl60.csm -Hc -Vx -Ve -ff -X- -r- -a8 -6 -b- -d -k -y -v 
-      -vi- -c -tW -tWM"/>
-    <PFLAGS value="-$Y+ -$W -$O- -$A8 -v -JPHNE -M"/>
+      -I$(BCB)\include\vcl -src_suffix cpp -boa"/>
+    <CFLAG1 value="-O2 -H=$(BCB)\lib\vcl60.csm -Hc -Vx -Ve -ff -X- -a8 -6 -b- -d -k- -vi -c 
+      -tW -tWM"/>
+    <PFLAGS value="-$Y- -$L- -$D- -$A8 -v -JPHNE -M"/>
     <RFLAGS value=""/>
-    <AFLAGS value="/mx /w2 /zi"/>
-    <LFLAGS value="-D&quot;&quot; -aa -Tpe -x -Gn -v"/>
+    <AFLAGS value="/mx /w2 /zn"/>
+    <LFLAGS value="-D&quot;&quot; -aa -Tpe -x -Gn"/>
     <OTHERFILES value=""/>
   </OPTIONS>
   <LINKER>
@@ -149,10 +149,10 @@
 [Version Info]
 IncludeVerInfo=1
 AutoIncBuild=0
-MajorVer=2018
-MinorVer=12
-Release=4
-Build=1700
+MajorVer=2019
+MinorVer=2
+Release=13
+Build=1720
 Debug=0
 PreRelease=0
 Special=0
@@ -164,7 +164,7 @@ CodePage=1251
 [Version Info Keys]
 CompanyName=Gizmo Factory
 FileDescription=
-FileVersion=2018.12.4.1700
+FileVersion=2019.2.13.1720
 InternalName=
 LegalCopyright=
 LegalTrademarks=
